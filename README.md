@@ -1,4 +1,4 @@
-# GMCommonAPI.js
+# GM Common Library - GMCommonAPI.js
 
 GMC is an API designed for easily adding Greasemonkey 4 compatibility to existing userscripts.
 
@@ -6,7 +6,7 @@ GMC provides a common subset of the functionality offered by the new "asynchrono
 
 With the introduction of the Greasemonkey 4 WebExtension (currently in beta [todo: link]), the classic GM_\* "synchronous" API is replaced with a new GM.\* "asynchronous API". The _features_ of the new API in Greasemonkey 4 (GM4) are very similar to the classic API, but the functions are asynchronous. This means you might need to (learn asynchronous programming and) do some refactoring of your existing userscripts to make use of the new API in GM4.
 
-As an alernative to refactoring your code, GMC offers a "synchronous subset" of the GM APIs, which works with scripts running in both the new GM4, in the older versions of Greasemonkey, and in other userscript managers like Tampermonkey and Violentmonkey. Where APIs are supported in GMC, no refactoring of your script is needed; Simply [todo: add GMC script/grants and] replace the use of GM_\* methods in your script with equialent GMC.\* methods.
+As an alternative to refactoring your code, GMC offers a "synchronous subset" of the GM APIs, which works with scripts running in both the new GM4, in the older versions of Greasemonkey, and in other userscript managers like Tampermonkey and Violentmonkey. Where APIs are supported in GMC, no refactoring of your script is needed; Simply [todo: add GMC script/grants and] replace the use of GM_\* methods in your script with equivalent GMC.\* methods.
 
 [todo: How to add GMC script and grants]
 
