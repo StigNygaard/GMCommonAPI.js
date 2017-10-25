@@ -12,4 +12,24 @@ As an alternative to refactoring your code, GMC offers a "synchronous subset" of
 
 [todo: Table: GMC method, Required Grants, GM_\*, GM.\*, description/comment]
 
+GMC.info,
+GMC.registerMenuCommand(caption, commandFunc, accessKey),
+GMC.getResourceURL(resourceName),
+GMC.setValue(name, value),
+GMC.getValue(name, defvalue),
+GMC.deleteValue(name),
+GMC.setLocalStorageValue(name, value),
+GMC.getLocalStorageValue(name, defvalue),
+GMC.deleteLocalStorageValue(name),
+GMC.setSessionStorageValue(name, value),
+GMC.getSessionStorageValue(name, defvalue),
+GMC.deleteSessionStorageValue(name),
+GMC.log(message),
+GMC.setClipboard(text),
+GMC.addStyle(style),
+GMC.openInTab(url).
+
 Notice, if you are ready to use an asynchronous API in your scripts, using a library wrapping the classic API into a new asynchronous API, can give you a larger cross-compatible API than using GMC. Adapting your userscripts to use an asynchronous cross-compatible API like polyfill.js [todo: link] is the recommended way to go forward for optimal performance and "API completeness".
+
+
+

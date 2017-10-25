@@ -1,6 +1,9 @@
-// GMC - GM Common Library. A "Synchronious API" compatible with both the new/upcoming Greasemonkey 4 WebExtension
-// and all the other common userscript managers.
-// A fast and easy way to add Greasemonkey 4 WebExtension compatibility for (some) existing "synchronious" userscripts.
+// GMC - GM Common Library. A "Synchronious API" compatible with both the new/upcoming
+// Greasemonkey 4 WebExtension and all the other common userscript managers.
+// A fast and easy way to add Greasemonkey 4 WebExtension compatibility for (some) existing
+// "synchronous" userscripts.
+
+// @version     2017.10.25.0
 
 var GMC = GMC || {
 
@@ -63,6 +66,36 @@ var GMC = GMC || {
             menuItem.setAttribute('label', caption);
             scriptMenu.appendChild(menuItem);
             menuItem.addEventListener('click',commandFunc, false);
+        }
+    },
+
+
+    /*
+     *  GMC.getResourceURL(resourceName)
+     *
+     *  This will use GM_getResourceURL if available, and otherwise try to find an url
+     *  directly via GM.info object properties.
+     *  Grants:
+     *  GM.info
+     *  GM_getResourceURL
+     */
+    getResourceURL: function(resourceName) {
+        if (typeof GM_getResourceURL === 'function') {
+            return GM_getResourceURL(resourceName);
+        } else if (typeof GMC.info === 'object') {
+            if (typeof GMC.info.script === 'object' && typeof GMC.info.script.resources === 'object' && typeof GMC.info.script.resources[resourceName] === 'object' && GMC.info.script.resources[resourceName].url) {
+                return GMC.info.script.resources[resourceName].url;
+            } else if (GMC.info.scriptMetaStr) {
+                // Parse metadata block to find the original "remote url" instead:
+                let ptrn = new RegExp('^\\s*\\/\\/\\s*@resource\\s+([^\\s]+)\\s+([^\\s]+)\\s*$','im');
+                let a = GMC.info.scriptMetaStr.match(ptrn);
+                if (a) {
+                    return a[2];
+                }
+            }
+            alert('Error: Cannot find url of resource=' + resourceName + ' in GMC.info object');
+        } else {
+            alert('Error: Cannot lookup resourceURL (Missing @grant for GM_info/GM.info or GM_getResourceURL?)');
         }
     },
 
@@ -305,69 +338,4 @@ var GMC = GMC || {
     },
 
 
-
-
-    // IN DEVELOPMENT
-
-
-    // HTML5 Web Notifications ?
-    //notification: (typeof GM_notification === 'function' ? GM_notification : (typeof GM === 'object' && typeof GM.notification === 'function' ? GM.notification : null)),
-
-
-    listValues: function() {
-        if (typeof GM_listValues === 'function') {
-            return GM_listValues();
-        } else {
-            return GMC.listLocalStorageValues();
-        }
-    },
-    listLocalStorageValues: function() {
-        alert('Sorry, listLocalStorageValues() not yet implemented...');
-        // String areay of Names (not including value)
-        // https://medium.com/@ramsunvtech/onfocus-html5-storage-apis-b45d92aa424b
-        // https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API
-    },
-    getResourceURL: function(resourceName) {
-        if (typeof GM_getResourceURL === 'function') {
-            return GM_getResourceURL(resourceName);
-        } else if (typeof GMC.info === 'object') {
-            if (typeof GMC.info.script === 'object' && typeof GMC.info.script.resources === 'object' && typeof GMC.info.script.resources[resourceName] === 'object' && GMC.info.script.resources[resourceName].url) {
-                return GMC.info.script.resources[resourceName].url;
-            } else if (GMC.info.scriptMetaStr) {
-                // Parse metadata block to find the original "remote url" instead:
-                let ptrn = new RegExp('^\\s*\\/\\/\\s*@resource\\s+([^\\s]+)\\s+([^\\s]+)\\s*$','im');
-                let a = GMC.info.scriptMetaStr.match(ptrn);
-                if (a) {
-                    return a[2];
-                }
-            }
-            alert('Error: Cannot find url of resource=' + resourceName + ' in GMC.info object');
-        } else {
-            alert('Error: Cannot lookup resourceURL (Missing @grant for GM_info/GM.info or GM_getResourceURL?)');
-        }
-    },
-
-    // INTERNAL or EXPERIMENTAL
-    showChangelog: function(log) {
-        alert('log: ' + log);
-    },
-    showAbout: function(log, paypalId) {
-        alert('about');
-    },
-    isProbablyGreasemonkey3X: function() { // Running on Greasemonkey Legacy version?
-        // if not Firefox => return false;
-        if (typeof GM_info === 'object' && typeof GM_info.script === 'object') {
-            return (typeof GM_info.script.author === 'undefined' && typeof GM_info.version === 'string' && GM_info.version.substring(0,2) === '3.');
-        } else if (typeof GM === 'object') {
-            return false;
-        }
-        return true;
-    },
-    inspect: function(obj) {
-        var output='';
-        for (var property in obj) {
-            output+=property+': ' + typeof obj[property] + ((typeof obj[property] === 'string' || typeof obj[property] === 'boolean' || typeof obj[property] === 'number') ? ' = ' + obj[property] : '') + '\n'; //+window.app.yui[obj]+'; ';
-        }
-        alert(output);
-    }
 };
