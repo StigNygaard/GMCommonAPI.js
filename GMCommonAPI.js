@@ -21,9 +21,9 @@ var GMC = GMC || {
     /*
      *  GMC.registerMenuCommand(caption, commandFunc, accessKey)
      *
-     *  Currently the GM4 API is missing GM.registerMenuCommand, but luckily Firefox supports HTML5 context menus, which
-     *  are created by this method when supported (Currently only supported in Firefox). AccessKey is currently ignored
-     *  in context menus.
+     *  Currently the GM4 API is missing GM.registerMenuCommand, but luckily Firefox supports HTML5 context
+     *  menus, which are created by this method when supported (Currently only supported in Firefox).
+     *  AccessKey is currently ignored in context menus.
      *  Grants:
      *  GM.info
      *  GM_info
@@ -103,12 +103,14 @@ var GMC = GMC || {
     /*
      *  GMC.setValue(name, value)
      *
-     *  When supported, this points to GM_setValue which stores values in a userscript specific database. Otherwise
-     *  the HTML5 Web Storage is used, which is a domain(+protocol) specific database in the browser.
-     *  IMPORTANT: If your userscript is a "single-domain" type, the difference in storage type is probably not a
-     *  problem, but for "multiple-domain userscripts" GMC.setValue() might not be a satisfying solution.
-     *  To prevent mistakenly overwriting or reading other clientscript's values when using Web Storage, a prefix based
-     *  on userscript namespace and scriptname is added to name used in Web Storage.
+     *  When supported, this points to GM_setValue which stores values in a userscript specific database.
+     *  Otherwise the HTML5 Web Storage is used, which is a domain(+protocol) specific database in the
+     *  browser.
+     *  IMPORTANT: If your userscript is a "single-domain type", the difference in storage type is probably
+     *  not a problem, but for "multiple-domain userscripts" GMC.setValue() might not be a satisfying
+     *  solution.
+     *  To prevent mistakenly overwriting or reading other clientscript's values when using Web Storage, a
+     *  prefix based on userscript namespace and scriptname is added to name used in Web Storage.
      *  Grants:
      *  GM.info
      *  GM_setValue
@@ -125,7 +127,8 @@ var GMC = GMC || {
     /*
      *  GMC.getValue(name, defvalue)
      *
-     *  Get the values stored using GMC.setValue(). When supported via GM_getValue and otherwise from HTML5 Web Storage.
+     *  Get the values stored using GMC.setValue(). When supported via GM_getValue and otherwise from
+     *  HTML5 Web Storage.
      *  Grants:
      *  GM.info
      *  GM_getValue
@@ -142,7 +145,8 @@ var GMC = GMC || {
     /*
      *  GMC.deleteValue(name)
      *
-     *  Deletes a value stored using GMC.setValue(). When supported via GM_deleteValue and otherwise from HTML5 Web Storage.
+     *  Deletes a value stored using GMC.setValue(). When supported via GM_deleteValue and otherwise from
+     *  HTML5 Web Storage.
      *  Grants:
      *  GM.info
      *  GM_deleteValue
@@ -159,9 +163,10 @@ var GMC = GMC || {
     /*
      *  GMC.setLocalStorageValue(name, value)
      *
-     *  Save value in HTML5 Web Storage (window.localStorage), which is a domain(+protocol) specific database in the browser.
-     *  To prevent mistakenly overwriting or reading other clientscript's values when using Web Storage, a prefix based
-     *  on userscript namespace and scriptname is added to the name used in Web Storage.
+     *  Save value in HTML5 Web Storage (window.localStorage), which is a domain(+protocol) specific
+     *  database in the browser. To prevent mistakenly overwriting or reading other clientscript's values
+     *  when using Web Storage, a prefix based on userscript namespace and scriptname is added to the name
+     *  used in Web Storage.
      *  Grants:
      *  GM.info
      *  GM_info
@@ -297,8 +302,8 @@ var GMC = GMC || {
     /*
      *  GMC.openInTab(url)
      *
-     *  Opens url in a new tab (or window). If GM_openInTab ain't supported window.open is used instead. In most
-     *  browsers/configurations this will open as a tab anyway (but no guarantee).
+     *  Opens url in a new tab (or window). If GM_openInTab ain't supported window.open is used instead.
+     *  In most browsers/configurations this will open as a tab anyway (but no guarantee).
      *  Grants:
      *  GM_openInTab
      */
