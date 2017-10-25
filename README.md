@@ -49,5 +49,6 @@ You can also [find GMC on Greasy Fork](https://greasyfork.org/scripts/34527). To
  
     // @require https://greasyfork.org/scripts/34527/code/GM%20Common%20Library%20-%20GMCommonAPIjs.js
 
+You can also just copy the complete (or needed parts of) javascript code into your userscript if you prefer to do it so. I consider the code Public Domain. 
 
 Notice, if you are ready to use an asynchronous API in your scripts, using a library wrapping the classic API into a new asynchronous API, can give you a larger cross-compatible API than using GMC. Adapting your userscripts to use an asynchronous cross-compatible API like [greasemonkey4-polyfill.js](https://arantius.com/misc/greasemonkey/imports/greasemonkey4-polyfill.js) is the recommended way to go forward for optimal performance and "API completeness".
