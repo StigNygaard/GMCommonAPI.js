@@ -45,7 +45,7 @@ Depending on which features you need to use, not all grants are required. Curren
 - GMC.addStyle(style)
 - GMC.openInTab(url)
 
-You can [find GMC from Greasy Fork](https://greasyfork.org/scripts/34527). To automatically include latest version, use:
+You can also [find GMC on Greasy Fork](https://greasyfork.org/scripts/34527). To automatically include latest version from Greasy Fork, use:
  
     // @require https://greasyfork.org/scripts/34527/code/GM%20Common%20Library%20-%20GMCommonAPIjs.js
 
