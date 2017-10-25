@@ -1,6 +1,6 @@
 # GM Common Library - GMCommonAPI.js
 
-GMC is an API designed for easily adding Greasemonkey 4 compatibility to existing userscripts.
+GM Common Library (GMC) is an API designed for easily adding Greasemonkey 4 compatibility to existing userscripts.
 
 GMC provides a common subset of the functionality offered by the new "asynchronous API" in Greasemonkey 4 (GM.\*) and the classic "synchronous API" from other userscript managers (GM_\*), offered in a single "classic" _synchronous API_ (GMC.\*).
 
