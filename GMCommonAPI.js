@@ -254,6 +254,8 @@ var GMC = GMC || {
      *
      *  Write a log-line to console. Uses GM_log if supported, otherwise directly via window.console.log().
      *  Grants:
+     *  GM.info
+     *  GM_info
      *  GM_log
      */
     log: function(message) {
