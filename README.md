@@ -29,4 +29,9 @@ With the [introduction of the Greasemonkey 4 WebExtension](http://www.greasespot
 - GMC.addStyle(style)
 - GMC.openInTab(url)
 
+You can [find GMC from Greasy Fork](https://greasyfork.org/scripts/34527). To automatically include latest version, use:
+ 
+    // @require https://greasyfork.org/scripts/34527/code/GM%20Common%20Library%20-%20GMCommonAPIjs.js
+
+
 Notice, if you are ready to use an asynchronous API in your scripts, using a library wrapping the classic API into a new asynchronous API, can give you a larger cross-compatible API than using GMC. Adapting your userscripts to use an asynchronous cross-compatible API like [greasemonkey4-polyfill.js](https://arantius.com/misc/greasemonkey/imports/greasemonkey4-polyfill.js) is the recommended way to go forward for optimal performance and "API completeness".
