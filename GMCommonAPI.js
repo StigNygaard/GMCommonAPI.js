@@ -3,17 +3,21 @@
 // A fast and easy way to add Greasemonkey 4 WebExtension compatibility for (some) existing
 // "synchronous" userscripts.
 
-// @version     2017.10.25.0
+// @version     2017.10.28.0
 
 var GMC = GMC || {
+
+    // CHANGELOG - The most important updates/versions:
+    changelog : [
+        {version: '2017.10.28', description: '@grant not needed for use of GM.info/GM_info.'},
+        {version: '2017.10.25', description: 'Initial release.'}
+    ],
 
     /*
      *  GMC.info
      *
      *  Maps to GM_info or GM.info object.
-     *  Grants:
-     *  GM.info
-     *  GM_info
+     *  Grants: none needed.
      */
     info: (typeof GM_info === 'object' ? GM_info : (typeof GM === 'object' && typeof GM.info === 'object' ? GM.info : null) ),
 
@@ -25,10 +29,8 @@ var GMC = GMC || {
      *  menus, which are created by this method when supported (Currently only supported in Firefox).
      *  AccessKey is currently ignored in context menus.
      *  Grants:
-     *  GM.info
-     *  GM_info
      *  GM_registerMenuCommand
-     *  GM.registerMenuCommand (Optional for possible future support. Currently not supported)
+     *  GM.registerMenuCommand (Optional for possible future support. Currently not available in any userscript manager)
      */
     registerMenuCommand: function(caption, commandFunc, accessKey) {
         if (typeof GM_registerMenuCommand === 'function') {
@@ -76,13 +78,12 @@ var GMC = GMC || {
      *  This will use GM_getResourceURL if available, and otherwise try to find an url
      *  directly via GM.info object properties.
      *  Grants:
-     *  GM.info
      *  GM_getResourceURL
      */
     getResourceURL: function(resourceName) {
         if (typeof GM_getResourceURL === 'function') {
             return GM_getResourceURL(resourceName);
-        } else if (typeof GMC.info === 'object') {
+        } else if (GMC.info) {
             if (typeof GMC.info.script === 'object' && typeof GMC.info.script.resources === 'object' && typeof GMC.info.script.resources[resourceName] === 'object' && GMC.info.script.resources[resourceName].url) {
                 return GMC.info.script.resources[resourceName].url;
             } else if (GMC.info.scriptMetaStr) {
@@ -95,7 +96,7 @@ var GMC = GMC || {
             }
             alert('Error: Cannot find url of resource=' + resourceName + ' in GMC.info object');
         } else {
-            alert('Error: Cannot lookup resourceURL (Missing @grant for GM_info/GM.info or GM_getResourceURL?)');
+            alert('Error: Cannot lookup resourceURL (Missing @grant for GM_getResourceURL?)');
         }
     },
 
@@ -112,7 +113,6 @@ var GMC = GMC || {
      *  To prevent mistakenly overwriting or reading other clientscript's values when using Web Storage, a
      *  prefix based on userscript namespace and scriptname is added to name used in Web Storage.
      *  Grants:
-     *  GM.info
      *  GM_setValue
      */
     setValue: function(name, value) {
@@ -130,7 +130,6 @@ var GMC = GMC || {
      *  Get the values stored using GMC.setValue(). When supported via GM_getValue and otherwise from
      *  HTML5 Web Storage.
      *  Grants:
-     *  GM.info
      *  GM_getValue
      */
     getValue: function(name, defvalue) { // getLocalStorageValue: function(name, defvalue) {
@@ -148,7 +147,6 @@ var GMC = GMC || {
      *  Deletes a value stored using GMC.setValue(). When supported via GM_deleteValue and otherwise from
      *  HTML5 Web Storage.
      *  Grants:
-     *  GM.info
      *  GM_deleteValue
      */
     deleteValue: function(name) {
@@ -167,9 +165,7 @@ var GMC = GMC || {
      *  database in the browser. To prevent mistakenly overwriting or reading other clientscript's values
      *  when using Web Storage, a prefix based on userscript namespace and scriptname is added to the name
      *  used in Web Storage.
-     *  Grants:
-     *  GM.info
-     *  GM_info
+     *  Grants: none needed.
      */
     setLocalStorageValue: function(name, value) {
         localStorage.setItem(GMC.getScriptIdentifier() + '_' + name, value);
@@ -180,9 +176,7 @@ var GMC = GMC || {
      *  GMC.getLocalStorageValue(name, defvalue)
      *
      *  Get a value that was stored using GMC.setLocalStorageValue().
-     *  Grants:
-     *  GM.info
-     *  GM_info
+     *  Grants: none needed.
      */
     getLocalStorageValue: function(name, defvalue) {
         if ((GMC.getScriptIdentifier()+'_'+name) in localStorage) {
@@ -197,9 +191,7 @@ var GMC = GMC || {
      *  GMC.deleteLocalStorageValue(name)
      *
      *  Deletes a value that was stored using GMC.setLocalStorageValue().
-     *  Grants:
-     *  GM.info
-     *  GM_info
+     *  Grants: none needed.
      */
     deleteLocalStorageValue: function(name) {
         localStorage.removeItem(GMC.getScriptIdentifier() + '_' + name);
@@ -210,9 +202,7 @@ var GMC = GMC || {
      *  GMC.setSessionStorageValue(name, value)
      *
      *  Similar to setLocalStorageValue(), but setSessionStorageValue() only stores for the current session.
-     *  Grants:
-     *  GM.info
-     *  GM_info
+     *  Grants: none needed.
      */
     setSessionStorageValue: function(name, value) {
         sessionStorage.setItem(GMC.getScriptIdentifier() + '_' + name, value);
@@ -223,9 +213,7 @@ var GMC = GMC || {
      *  GMC.getSessionStorageValue(name, defvalue)
      *
      *  Get a value that was stored using GMC.setSessionStorageValue().
-     *  Grants:
-     *  GM.info
-     *  GM_info
+     *  Grants: none needed.
      */
     getSessionStorageValue: function(name, defvalue) {
         if ((GMC.getScriptIdentifier()+'_'+name) in localStorage) {
@@ -240,9 +228,7 @@ var GMC = GMC || {
      *  GMC.deleteSessionStorageValue(name)
      *
      *  Deletes a value that was stored using GMC.setSessionStorageValue().
-     *  Grants:
-     *  GM.info
-     *  GM_info
+     *  Grants: none needed.
      */
     deleteSessionStorageValue: function(name) {
         sessionStorage.removeItem(GMC.getScriptIdentifier() + '_' + name);
@@ -254,8 +240,6 @@ var GMC = GMC || {
      *
      *  Write a log-line to console. Uses GM_log if supported, otherwise directly via window.console.log().
      *  Grants:
-     *  GM.info
-     *  GM_info
      *  GM_log
      */
     log: function(message) {
@@ -297,7 +281,7 @@ var GMC = GMC || {
             head.appendChild(styleElem);
             return styleElem;
         }
-        return null;
+        alert('Error: Unable to add style element in head.');
     },
 
 
@@ -333,16 +317,15 @@ var GMC = GMC || {
         }
     },
     getScriptIdentifier: function() { // A "safe" identifier without any special characters
-        if (typeof GMC.info === 'object' && typeof GMC.info.script === 'object') {
+        if (GMC.info && typeof GMC.info.script === 'object') {
             return 'gmc' + GMC.getScriptNamespace().replace(/[^\w]+/g,'x') + GMC.getScriptName().replace(/[^\w]+/g,'x');
         } else {
-            alert('Error: Script Namespace or Name not found (Missing @grant for GM_info/GM.info?)');
+            alert('Error: Script Namespace or Name not found.');
         }
     },
-    contextMenuSupported: function() { // Argh, it's a bit ugly, maybe not 100% accurate (and maybe unnecessary), but...
+    contextMenuSupported: function() { // Argh, it's a bit ugly, not 100% accurate (and maybe unnecessary), but...
         let oMenu = document.createElement("menu");
         return (oMenu.type !== "undefined"); // type="list|context|toolbar" if supported ?
     },
-
 
 };

@@ -10,8 +10,6 @@ With the [introduction of the Greasemonkey 4 WebExtension](http://www.greasespot
 
 Add GMC to your userscript by adding following to the Meta data block:
 
-    // @grant   GM.info
-    // @grant   GM_info
     // @grant   GM_registerMenuCommand
     // @grant   GM_getResourceURL
     // @grant   GM_setValue
@@ -29,7 +27,7 @@ Depending on which features you need to use, not all grants are required. Curren
 **todo**: Table: GMC method, Required Grants, GM_\*, GM.\*, description/comment
 
 - GMC.info
-- GMC.registerMenuCommand(caption, commandFunc, accessKey)  **- This creates a page _context menu_ in GM4**
+- GMC.registerMenuCommand(caption, commandFunc, accessKey)  **- This creates a page _context menu_ in GM4/Firefox**
 - GMC.getResourceURL(resourceName)
 - GMC.setValue(name, value)  **- See compatibility comment in source code!**
 - GMC.getValue(name, defvalue)
@@ -49,6 +47,6 @@ You can also [find GMC on Greasy Fork](https://greasyfork.org/scripts/34527). To
  
     // @require https://greasyfork.org/scripts/34527/code/GM%20Common%20Library%20-%20GMCommonAPIjs.js
 
-You can also just copy the complete (or needed parts of) javascript code into your userscript if you prefer to do it so. I consider the code Public Domain. 
+You can also just copy the complete (or the needed parts of) javascript code into your userscript if you prefer to do it so. I consider the code Public Domain. 
 
 Notice, if you are ready to use an asynchronous API in your scripts, using a library wrapping the classic API into a new asynchronous API, can give you a larger cross-compatible API than using GMC. Adapting your userscripts to use an asynchronous cross-compatible API like [greasemonkey4-polyfill.js](https://arantius.com/misc/greasemonkey/imports/greasemonkey4-polyfill.js) is the recommended way to go forward for optimal performance and "API completeness".
