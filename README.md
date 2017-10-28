@@ -20,7 +20,7 @@ Add GMC to your userscript by adding following to the Meta data block:
     // @grant   GM_setClipboard
     // @grant   GM_addStyle
     // @grant   GM_openInTab
-    // @require https://greasyfork.org/scripts/34527/code/GM%20Common%20Library%20-%20GMCommonAPIjs.js
+    // @require https://greasyfork.org/scripts/34527/code/GMCommonAPI.js
 
 Depending on which features you need to use, not all grants are required. Currently you need to check comments in the sourcecode to find the needed @grants for each method (**todo:** Document it in this README).
 
@@ -45,7 +45,7 @@ Depending on which features you need to use, not all grants are required. Curren
 
 You can also [find GMC on Greasy Fork](https://greasyfork.org/scripts/34527). To include latest version from Greasy Fork, use:
  
-    // @require https://greasyfork.org/scripts/34527/code/GM%20Common%20Library%20-%20GMCommonAPIjs.js
+    // @require https://greasyfork.org/scripts/34527/code/GMCommonAPI.js
 
 You can also just copy the complete (or the needed parts of) javascript code into your userscript if you prefer to do it so. I consider the code Public Domain. 
 
