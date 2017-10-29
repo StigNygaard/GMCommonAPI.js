@@ -1,17 +1,23 @@
-// GMC - GM Common Library. A "Synchronious API" compatible with both the new/upcoming
-// Greasemonkey 4 WebExtension and all the other common userscript managers.
-// A fast and easy way to add Greasemonkey 4 WebExtension compatibility for (some) existing
-// "synchronous" userscripts.
+/*
+ *      GM Common API is a library for userscripts. A "Synchronious API" compatible with
+ *      both the new/upcoming Greasemonkey 4 WebExtension and all the other commonly used
+ *      userscript managers. Using GM Common API can be a fast and easy way to add
+ *      Greasemonkey 4 WebExtension compatibility to (some) existing userscripts.
+ *
+ *      https://greasyfork.org/scripts/34527-gmcommonapi-js
+ *      https://github.com/StigNygaard/GMCommonAPI.js
+ */
 
-// @version     2017.10.28.0
 
 var GMC = GMC || {
 
     // CHANGELOG - The most important updates/versions:
     changelog : [
+        {version: '2017.10.29', description: 'Adding GMC.listValues(), GMC.listLocalStorageValues() and GMC.listSessionStorageValues().'},
         {version: '2017.10.28', description: '@grant not needed for use of GM.info/GM_info.'},
         {version: '2017.10.25', description: 'Initial release.'}
     ],
+
 
     /*
      *  GMC.info
@@ -159,6 +165,23 @@ var GMC = GMC || {
 
 
     /*
+     *  GMC.listValues()
+     *
+     *  Returns the values (key-names) stored using GMC.setValue(). When supported via GM_listValues and
+     *  otherwise from HTML5 Web Storage.
+     *  Grants:
+     *  GM_listValues
+     */
+    listValues: function() {
+        if (typeof GM_listValues === 'function') {
+            return GM_listValues();
+        } else {
+            return GMC.listLocalStorageValues();
+        }
+    },
+
+
+    /*
      *  GMC.setLocalStorageValue(name, value)
      *
      *  Save value in HTML5 Web Storage (window.localStorage), which is a domain(+protocol) specific
@@ -199,6 +222,25 @@ var GMC = GMC || {
 
 
     /*
+     *  GMC.listLocalStorageValues()
+     *
+     *  Returns the values (key-names) stored using GMC.setLocalStorageValue().
+     *  Grants: none needed.
+     */
+    listLocalStorageValues: function() {
+        let values = [];
+        let prefix = GMC.getScriptIdentifier();
+        let prelen = GMC.getScriptIdentifier().length;
+        for (let i = 0; i < localStorage.length; i++) {
+            if (localStorage.key(i).substr(0, prelen) === prefix) {
+                values.push(localStorage.key(i).substr(prelen+1));
+            }
+        }
+        return values;
+    },
+
+
+    /*
      *  GMC.setSessionStorageValue(name, value)
      *
      *  Similar to setLocalStorageValue(), but setSessionStorageValue() only stores for the current session.
@@ -232,6 +274,25 @@ var GMC = GMC || {
      */
     deleteSessionStorageValue: function(name) {
         sessionStorage.removeItem(GMC.getScriptIdentifier() + '_' + name);
+    },
+
+
+    /*
+     *  GMC.listSessionStorageValues()
+     *
+     *  Returns the values (key-names) stored using GMC.setSessionStorageValue().
+     *  Grants: none needed.
+     */
+    listSessionStorageValues: function() {
+        let values = [];
+        let prefix = GMC.getScriptIdentifier();
+        let prelen = GMC.getScriptIdentifier().length;
+        for (let i = 0; i < sessionStorage.length; i++) {
+            if (sessionStorage.key(i).substr(0, prelen) === prefix) {
+                values.push(sessionStorage.key(i).substr(prelen+1));
+            }
+        }
+        return values;
     },
 
 
