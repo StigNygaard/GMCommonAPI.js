@@ -23,7 +23,7 @@ Add GMC to your userscript by adding (some of the) following declarations to the
     // @grant   GM_openInTab
     // @require https://greasyfork.org/scripts/34527/code/GMCommonAPI.js
 
-Depending on which features you need to use, not all grants are required. Currently you need to check [comments in the sourcecode](https://github.com/StigNygaard/GMCommonAPI.js/blob/master/GMCommonAPI.js) to find the needed \@grant declarations for each method (**todo:** Document it in this README).
+Depending on which features you need to use, not all grants are required. Currently you need to check [comments in the sourcecode](https://raw.githubusercontent.com/StigNygaard/GMCommonAPI.js/master/GMCommonAPI.js) to find the needed \@grant declarations for each method (**todo:** Document it in this README).
 
 **todo**: Table: GMC method, Required Grants, GM_\*, GM.\*, description/comment
 
