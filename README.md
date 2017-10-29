@@ -8,13 +8,14 @@ With the [introduction of the Greasemonkey 4 WebExtension](http://www.greasespot
 
 **As an _alternative_ to refactoring your code, GMC offers a "synchronous subset" of the GM APIs**, which works with scripts running in both the new GM4, in the older versions of Greasemonkey, and in other userscript managers like Tampermonkey and Violentmonkey. Where APIs are supported in GMC, no refactoring of your script is needed; Simply add needed \@require and \@grant declarations to your userscript, and replace the use of GM_\* methods with equivalent GMC.\* methods.
 
-Add GMC to your userscript by adding following to the Meta data block:
+Add GMC to your userscript by adding (some of the) following to the Meta data block:
 
     // @grant   GM_registerMenuCommand
     // @grant   GM_getResourceURL
     // @grant   GM_setValue
     // @grant   GM_getValue
     // @grant   GM_deleteValue
+    // @grant   GM_listValues
     // @grant   GM_log
     // @grant   GM.setClipboard
     // @grant   GM_setClipboard
