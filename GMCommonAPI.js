@@ -13,6 +13,7 @@ var GMC = GMC || {
 
     // CHANGELOG - The most important updates/versions:
     changelog : [
+        {version: '2017.11.01', description: 'Minor optimizations.'},
         {version: '2017.10.29', description: 'Adding GMC.listValues(), GMC.listLocalStorageValues() and GMC.listSessionStorageValues().'},
         {version: '2017.10.28', description: '@grant not needed for use of GM.info/GM_info.'},
         {version: '2017.10.25', description: 'Initial release.'}
@@ -25,7 +26,7 @@ var GMC = GMC || {
      *  Maps to GM_info or GM.info object.
      *  Grants: none needed.
      */
-    info: (typeof GM_info === 'object' ? GM_info : (typeof GM === 'object' && typeof GM.info === 'object' ? GM.info : null) ),
+    info: (GM_info ? GM_info : (GM && typeof GM.info === 'object' ? GM.info : null) ),
 
 
     /*
@@ -42,32 +43,37 @@ var GMC = GMC || {
         if (typeof GM_registerMenuCommand === 'function') {
             // Supported by most userscript extensions, but currently NOT in the upcoming Greasemonkey 4 WebExtension and it's new asynchronous API!
             GM_registerMenuCommand(caption, commandFunc, accessKey);
-        } else if (typeof GM === 'object' && typeof GM.registerMenuCommand === 'function') {
+        } else if (GM && typeof GM.registerMenuCommand === 'function') {
             // Will probably NOT be implemented in the upcoming Greasemonkey 4 WebExtension, but if?...
             GM.registerMenuCommand(caption, commandFunc, accessKey);
         }
-        if (GMC.contextMenuSupported()) {
+        if (GMC.contextMenuSupported() && document.body) {
+            // if (!document.body) {
+            //     alert('Error: body for context menu not found.');
+            //     return;
+            //      If too early, maybe set it up on pageload event???
+            // }
             // Setup HTML5 contextmenu on page - Currently only supported in Firefox...
-            let menuElem = null;
+            let menuContainer = null;
             if (document.body.getAttribute('contextmenu')) {
                 // If existing context menu on body, don't replace but use it...
-                menuElem = document.querySelector('menu#'+document.body.getAttribute('contextmenu'));
+                menuContainer = document.querySelector('menu#'+document.body.getAttribute('contextmenu'));
             }
-            if (!menuElem) {
+            if (!menuContainer) {
                 // if not already exist, create the "top menu container"
-                menuElem = document.createElement("menu");
-                menuElem.setAttribute('type', 'context');
-                menuElem.id = 'gmcmenu';
-                document.body.appendChild(menuElem);
+                menuContainer = document.createElement("menu");
+                menuContainer.setAttribute('type', 'context');
+                menuContainer.id = 'gm-registered-menu'; // or gmcmenu
+                document.body.appendChild(menuContainer);
             }
-            document.body.setAttribute('contextmenu', menuElem.id);
+            document.body.setAttribute('contextmenu', menuContainer.id);
             let scriptMenu = document.querySelector('menu#menu'+GMC.getScriptIdentifier());
             if (!scriptMenu) {
-                // if not already exist, create "menu container" for current userscript
+                // if not already exist, create "sub-menu" for current userscript
                 scriptMenu = document.createElement("menu");
                 scriptMenu.setAttribute('label', GMC.getScriptName());
                 scriptMenu.id = 'menu'+GMC.getScriptIdentifier();
-                menuElem.appendChild(scriptMenu);
+                menuContainer.appendChild(scriptMenu);
             }
             // create menu item
             let menuItem = document.createElement("menuitem");
@@ -80,6 +86,7 @@ var GMC = GMC || {
 
     /*
      *  GMC.getResourceURL(resourceName)
+     *  GMC.getResourceUrl(resourceName)
      *
      *  This will use GM_getResourceURL if available, and otherwise try to find an url
      *  directly via GM.info object properties.
@@ -104,6 +111,9 @@ var GMC = GMC || {
         } else {
             alert('Error: Cannot lookup resourceURL (Missing @grant for GM_getResourceURL?)');
         }
+    },
+    getResourceUrl: function(resourceName) {
+        return GMC.getResourceURL(resourceName);
     },
 
 
@@ -320,7 +330,7 @@ var GMC = GMC || {
      *  GM.setClipboard
      *  GM_setClipboard
      */
-    setClipboard: (typeof GM_setClipboard === 'function' ? GM_setClipboard : (typeof GM === 'object' && typeof GM.setClipboard === 'function' ? GM.setClipboard : null)),
+    setClipboard: (typeof GM_setClipboard === 'function' ? GM_setClipboard : (typeof GM === 'object' && GM !== null && typeof GM.setClipboard === 'function' ? GM.setClipboard : null) ),
 
 
     /*
