@@ -63,16 +63,16 @@ var GMC = GMC || {
                 // if not already exist, create the "top menu container"
                 menuContainer = document.createElement("menu");
                 menuContainer.setAttribute('type', 'context');
-                menuContainer.id = 'gm-registered-menu'; // or gmcmenu
+                menuContainer.setAttribute('id', 'gm-registered-menu');
                 document.body.appendChild(menuContainer);
             }
-            document.body.setAttribute('contextmenu', menuContainer.id);
+            document.body.setAttribute('contextmenu', menuContainer.getAttribute('id'));
             let scriptMenu = document.querySelector('menu#menu'+GMC.getScriptIdentifier());
             if (!scriptMenu) {
                 // if not already exist, create "sub-menu" for current userscript
                 scriptMenu = document.createElement("menu");
                 scriptMenu.setAttribute('label', GMC.getScriptName());
-                scriptMenu.id = 'menu'+GMC.getScriptIdentifier();
+                scriptMenu.setAttribute('id', 'menu'+GMC.getScriptIdentifier());
                 menuContainer.appendChild(scriptMenu);
             }
             // create menu item

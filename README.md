@@ -21,7 +21,7 @@ Add GMC to your userscript by adding (some of the) following declarations to the
     // @grant   GM_setClipboard
     // @grant   GM_addStyle
     // @grant   GM_openInTab
-    // @require https://greasyfork.org/scripts/34527/code/GMCommonAPI.js
+    // @require https://github.com/StigNygaard/GMCommonAPI.js/raw/master/GMCommonAPI.js
 
 Depending on which features you need to use, not all grants are required. Currently you need to check [comments in the sourcecode](https://raw.githubusercontent.com/StigNygaard/GMCommonAPI.js/master/GMCommonAPI.js) to find the needed \@grant declarations for each method (**todo:** Document it in this README).
 
@@ -47,13 +47,13 @@ Depending on which features you need to use, not all grants are required. Curren
 - GMC.addStyle(style)
 - GMC.openInTab(url)
 
-You can also [find GM Common API on Greasy Fork](https://greasyfork.org/scripts/34527). To include latest version from Greasy Fork, use:
+You can include GMCommonAPI.js here from GitHub, but you can also [find GM Common API on Greasy Fork](https://greasyfork.org/scripts/34527). To include latest version from Greasy Fork, use:
  
     // @require https://greasyfork.org/scripts/34527/code/GMCommonAPI.js
 
-To freeze the version to include, use the _version_ parameter [as shown on Greasy Fork](https://greasyfork.org/scripts/34527). For example:
+To freeze the version included from Greasy Fork, use the _version_ parameter [as shown on Greasy Fork](https://greasyfork.org/scripts/34527). For example:
 
-    // @require https://greasyfork.org/scripts/34527/code/GMCommonAPI.js?version=226826
+    // @require https://greasyfork.org/scripts/34527/code/GMCommonAPI.js?version=227517
 
 You can also just copy the complete (or the needed parts of the) javascript code into your userscript if you prefer to do it so. I consider the code Public Domain. 
 
