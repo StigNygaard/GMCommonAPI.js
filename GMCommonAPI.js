@@ -13,7 +13,7 @@ var GMC = GMC || {
 
     // CHANGELOG - The most important updates/versions:
     changelog : [
-        {version: '2017.11.01', description: 'Minor optimizations.'},
+        {version: '2017.11.09', description: 'Misc. updates.'},
         {version: '2017.10.29', description: 'Adding GMC.listValues(), GMC.listLocalStorageValues() and GMC.listSessionStorageValues().'},
         {version: '2017.10.28', description: '@grant not needed for use of GM.info/GM_info.'},
         {version: '2017.10.25', description: 'Initial release.'}
