@@ -2,13 +2,13 @@
 
 GM Common API (GMC) is a library designed for _easily adding **Greasemonkey 4** compatibility_ to existing userscripts.
 
-GMC provides a common subset of the functionality offered by the new "asynchronous API" in Greasemonkey 4 (GM.\*) and the classic "synchronous API" from other userscript managers (GM_\*), offered in a single "classic" _synchronous API_ (GMC.\*).
+GMC provides a common subset of the functionality offered by the new "asynchronous API" in Greasemonkey 4 (GM.\*) and the classic "synchronous API" from other userscript managers (GM_\*). All offered in a single "classic" _synchronous API_ (GMC.\*).
 
-With the [introduction of the Greasemonkey 4 WebExtension](http://www.greasespot.net/2017/09/greasemonkey-4-announcement.html) ([currently in beta](https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/versions/beta)), the classic GM_\* "synchronous" API is replaced with a new GM.\* "asynchronous API". The _features_ of the new API in Greasemonkey 4 (GM4) are very similar to the classic API, but the functions are asynchronous. This means you might need to (learn asynchronous programming and) do some refactoring of your existing userscripts to make use of the new API in GM4.
+With the [introduction of the Greasemonkey 4 WebExtension](http://www.greasespot.net/2017/09/greasemonkey-4-announcement.html), the classic GM_\* "synchronous" API is replaced with a new GM.\* "asynchronous API". The _features_ of the new API in Greasemonkey 4 (GM4) are very similar to the classic API, but all the functions are _asynchronous_. This means you might need to (learn asynchronous programming and) do some refactoring of your existing userscripts to make use of the new API in GM4.
 
-**As an _alternative_ to refactoring your code, GMC offers a "synchronous subset" of the GM APIs**, which works with scripts running in both the new GM4, in the older versions of Greasemonkey, and in other userscript managers like Tampermonkey and Violentmonkey. Where APIs are supported in GMC, no refactoring of your script is needed; Simply add needed \@require and \@grant declarations to your userscript, and replace the use of GM_\* methods with equivalent GMC.\* methods.
+**As an _alternative_ to refactoring your code, GMC offers a "synchronous subset" of the GM APIs** which works with scripts running in both the new GM4, the older versions of Greasemonkey, and in other userscript managers like Tampermonkey and Violentmonkey. Where APIs are supported in GMC, no refactoring of your script is needed; Simply add the needed \@require declaration (and eventually \@grant declarations) to your userscript, and replace the use of GM_\* methods with equivalent GMC.\* methods.
 
-Add GMC to your userscript by adding (some of the) following declarations to the Meta data block:
+You can add GMC to your userscript by adding (some of the) following declarations to the Meta data block:
 
     // @grant   GM_registerMenuCommand
     // @grant   GM_getResourceURL
@@ -25,7 +25,7 @@ Add GMC to your userscript by adding (some of the) following declarations to the
 
 Depending on which features you need to use, not all grants are required. Currently you need to check [comments in the sourcecode](https://raw.githubusercontent.com/StigNygaard/GMCommonAPI.js/master/GMCommonAPI.js) to find the needed \@grant declarations for each method (**todo:** Document it in this README).
 
-**todo**: Table: GMC method, Required Grants, GM_\*, GM.\*, description/comment
+Currently implemented methods and properties in GMCommonAPI.js are:
 
 - GMC.info
 - GMC.registerMenuCommand(caption, commandFunc, accessKey)  **- This creates a page _context menu_ in GM4/Firefox**
@@ -53,8 +53,8 @@ You can include GMCommonAPI.js here from GitHub, but you can also [find GM Commo
 
 To freeze the version included from Greasy Fork, use the _version_ parameter [as shown on Greasy Fork](https://greasyfork.org/scripts/34527). For example:
 
-    // @require https://greasyfork.org/scripts/34527/code/GMCommonAPI.js?version=227517
+    // @require https://greasyfork.org/scripts/34527/code/GMCommonAPI.js?version=228486
 
 You can also just copy the complete (or the needed parts of the) javascript code into your userscript if you prefer to do it so. I consider the code Public Domain. 
 
-Notice, if you are ready to use an asynchronous API in your scripts, using a library wrapping the classic API into a new asynchronous API, can give you a larger cross-compatible API than using GMC. Adapting your userscripts to use an asynchronous cross-compatible API like [greasemonkey4-polyfill.js](https://arantius.com/misc/greasemonkey/imports/greasemonkey4-polyfill.js) is the recommended way to go forward for optimal performance and "API completeness".
+Notice, if you are ready to use an asynchronous API in your userscript (including the refactoring probably needed), you can use a library wrapping the classic API into the new asynchronous API. This will give you a larger cross-compatible API than using GMC. Adapting your userscripts to use an asynchronous cross-compatible API like [gm4-polyfill.js](https://github.com/greasemonkey/gm4-polyfill) is the recommended way to go forward for _optimal_ performance and "API completeness". GMC might just be a bit easier and faster to use for some of us.

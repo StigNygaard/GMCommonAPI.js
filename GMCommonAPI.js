@@ -1,6 +1,6 @@
 /*
- *      GM Common API is a library for userscripts. A "Synchronious API" compatible with
- *      both the new/upcoming Greasemonkey 4 WebExtension and all the other commonly used
+ *      GM Common API is a library for userscripts. A "Synchronious API" compatible
+ *      with both Greasemonkey 4 WebExtension and all the other commonly used
  *      userscript managers. Using GM Common API can be a fast and easy way to add
  *      Greasemonkey 4 WebExtension compatibility to (some) existing userscripts.
  *
@@ -31,55 +31,76 @@ var GMC = GMC || {
 
     /*
      *  GMC.registerMenuCommand(caption, commandFunc, accessKey)
+     *  GMC.registerMenuCommand(caption, commandFunc, options)
      *
-     *  Currently the GM4 API is missing GM.registerMenuCommand, but luckily Firefox supports HTML5 context
-     *  menus, which are created by this method when supported (Currently only supported in Firefox).
-     *  AccessKey is currently ignored in context menus.
+     *  Currently the GM4 API is missing GM.registerMenuCommand, but luckily Firefox supports HTML5
+     *  context menus, which are created by this method when supported (Currently only supported by
+     *  Firefox). AccessKey is currently ignored for context menus.
+     *  Instead of the accessKey string parameter, there's an option to pass an options object
+     *  adding multiple configuration options for fine-tuning context menus.
+     *  (TODO: Document (and test) the options parameter for context-menus)
      *  Grants:
      *  GM_registerMenuCommand
      *  GM.registerMenuCommand (Optional for possible future support. Currently not available in any userscript manager)
      */
-    registerMenuCommand: function(caption, commandFunc, accessKey) {
+    registerMenuCommand: function(caption, commandFunc, options) {
+        if (typeof options === 'string') {
+            options = {accessKey: options};
+        } else if (typeof options === 'undefined') {
+            options = {};
+        }
         if (typeof GM_registerMenuCommand === 'function') {
-            // Supported by most userscript extensions, but currently NOT in the upcoming Greasemonkey 4 WebExtension and it's new asynchronous API!
-            GM_registerMenuCommand(caption, commandFunc, accessKey);
+            // Supported by most userscript extensions, but NOT in Greasemonkey 4 WebExtension
+            GM_registerMenuCommand(caption, commandFunc, options.accessKey);
         } else if (GM && typeof GM.registerMenuCommand === 'function') {
             // Will probably NOT be implemented in the upcoming Greasemonkey 4 WebExtension, but if?...
-            GM.registerMenuCommand(caption, commandFunc, accessKey);
+            GM.registerMenuCommand(caption, commandFunc, options.accessKey);
         }
-        if (GMC.contextMenuSupported() && document.body) {
-            // if (!document.body) {
-            //     alert('Error: body for context menu not found.');
-            //     return;
-            //      If too early, maybe set it up on pageload event???
-            // }
+        if (GMC.contextMenuSupported()) {
+            if (!document.body) {
+                alert('GMC Error: Body for context menu not found.');
+                return;
+            }
             // Setup HTML5 contextmenu on page - Currently only supported in Firefox...
-            let menuContainer = null;
+            let topMenu = null;
             if (document.body.getAttribute('contextmenu')) {
                 // If existing context menu on body, don't replace but use it...
-                menuContainer = document.querySelector('menu#'+document.body.getAttribute('contextmenu'));
+                topMenu = document.querySelector('menu#'+document.body.getAttribute('contextmenu'));
             }
-            if (!menuContainer) {
+            if (!topMenu) {
                 // if not already exist, create the "top menu container"
-                menuContainer = document.createElement("menu");
-                menuContainer.setAttribute('type', 'context');
-                menuContainer.setAttribute('id', 'gm-registered-menu');
-                document.body.appendChild(menuContainer);
+                topMenu = document.createElement("menu");
+                topMenu.setAttribute('type', 'context');
+                topMenu.setAttribute('id', 'gm-registered-menu');
+                document.body.appendChild(topMenu);
+                document.body.setAttribute('contextmenu', topMenu.getAttribute('id'));
+
             }
-            document.body.setAttribute('contextmenu', menuContainer.getAttribute('id'));
-            let scriptMenu = document.querySelector('menu#menu'+GMC.getScriptIdentifier());
-            if (!scriptMenu) {
-                // if not already exist, create "sub-menu" for current userscript
-                scriptMenu = document.createElement("menu");
-                scriptMenu.setAttribute('label', GMC.getScriptName());
-                scriptMenu.setAttribute('id', 'menu'+GMC.getScriptIdentifier());
-                menuContainer.appendChild(scriptMenu);
-            }
-            // create menu item
+            // Create menu item
             let menuItem = document.createElement("menuitem");
+            menuItem.setAttribute('type', options.type ? options.type : 'command'); // command, checkbox or radio
             menuItem.setAttribute('label', caption);
-            scriptMenu.appendChild(menuItem);
-            menuItem.addEventListener('click',commandFunc, false);
+            if (options.id) menuItem.setAttribute('id', options.id);
+            if (options.name) menuItem.setAttribute('name', options.name);
+            if (options.checked) menuItem.setAttribute('checked', 'checked');
+            if (options.disabled) menuItem.setAttribute('disabled', 'disabled');
+            if (options.icon) menuItem.setAttribute('icon', options.icon);
+            // Append menuitem
+            if (options.topLevel) {
+                topMenu.appendChild(menuItem)
+            } else { // script menu
+                let scriptMenu = document.querySelector('menu#menu'+GMC.getScriptIdentifier());
+                if (!scriptMenu) {
+                    // if not already exist, create a "sub-menu" for current userscript
+                    scriptMenu = document.createElement("menu");
+                    scriptMenu.setAttribute('label', GMC.getScriptName());
+                    scriptMenu.setAttribute('id', 'menu' + GMC.getScriptIdentifier());
+                    // icon = icon32??? NO, icon not working for menu elements :-(
+                    topMenu.appendChild(scriptMenu);
+                }
+                scriptMenu.appendChild(menuItem);
+            }
+            menuItem.addEventListener('click', commandFunc, false);
         }
     },
 
@@ -88,8 +109,8 @@ var GMC = GMC || {
      *  GMC.getResourceURL(resourceName)
      *  GMC.getResourceUrl(resourceName)
      *
-     *  This will use GM_getResourceURL if available, and otherwise try to find an url
-     *  directly via GM.info object properties.
+     *  This will use GM_getResourceURL if available, and otherwise try to find an url directly via
+     *  the GMC.info object properties.
      *  Grants:
      *  GM_getResourceURL
      */
@@ -107,9 +128,9 @@ var GMC = GMC || {
                     return a[2];
                 }
             }
-            alert('Error: Cannot find url of resource=' + resourceName + ' in GMC.info object');
+            alert('GMC Error: Cannot find url of resource=' + resourceName + ' in GMC.info object');
         } else {
-            alert('Error: Cannot lookup resourceURL (Missing @grant for GM_getResourceURL?)');
+            alert('GMC Error: Cannot lookup resourceURL (Missing @grant for GM_getResourceURL?)');
         }
     },
     getResourceUrl: function(resourceName) {
@@ -120,14 +141,15 @@ var GMC = GMC || {
     /*
      *  GMC.setValue(name, value)
      *
-     *  When supported, this points to GM_setValue which stores values in a userscript specific database.
-     *  Otherwise the HTML5 Web Storage is used, which is a domain(+protocol) specific database in the
-     *  browser.
-     *  IMPORTANT: If your userscript is a "single-domain type", the difference in storage type is probably
-     *  not a problem, but for "multiple-domain userscripts" GMC.setValue() might not be a satisfying
-     *  solution.
-     *  To prevent mistakenly overwriting or reading other clientscript's values when using Web Storage, a
-     *  prefix based on userscript namespace and scriptname is added to name used in Web Storage.
+     *  When supported, this points to GM_setValue which stores values in a userscript specific
+     *  database. Otherwise the HTML5 Web Storage is used, which is a domain(+protocol) specific
+     *  database in the browser.
+     *  IMPORTANT: If your userscript is a "single-domain type", the difference in storage type is
+     *  probably not a problem, but for "multiple-domain userscripts" GMC.setValue() might not be a
+     *  satisfying solution.
+     *  To prevent mistakenly overwriting or reading other clientscript's values when using Web
+     *  Storage, a prefix based on userscript namespace and scriptname is added to name used in Web
+     *  Storage.
      *  Grants:
      *  GM_setValue
      */
@@ -160,8 +182,8 @@ var GMC = GMC || {
     /*
      *  GMC.deleteValue(name)
      *
-     *  Deletes a value stored using GMC.setValue(). When supported via GM_deleteValue and otherwise from
-     *  HTML5 Web Storage.
+     *  Deletes a value stored using GMC.setValue(). When supported via GM_deleteValue and otherwise
+     *  from HTML5 Web Storage.
      *  Grants:
      *  GM_deleteValue
      */
@@ -177,8 +199,8 @@ var GMC = GMC || {
     /*
      *  GMC.listValues()
      *
-     *  Returns the values (key-names) stored using GMC.setValue(). When supported via GM_listValues and
-     *  otherwise from HTML5 Web Storage.
+     *  Returns the values (key-names) stored using GMC.setValue(). When supported via GM_listValues
+     *  and otherwise from HTML5 Web Storage.
      *  Grants:
      *  GM_listValues
      */
@@ -195,9 +217,9 @@ var GMC = GMC || {
      *  GMC.setLocalStorageValue(name, value)
      *
      *  Save value in HTML5 Web Storage (window.localStorage), which is a domain(+protocol) specific
-     *  database in the browser. To prevent mistakenly overwriting or reading other clientscript's values
-     *  when using Web Storage, a prefix based on userscript namespace and scriptname is added to the name
-     *  used in Web Storage.
+     *  database in the browser. To prevent mistakenly overwriting or reading other clientscript's
+     *  values when using Web Storage, a prefix based on userscript namespace and scriptname is added
+     *  to the name used in Web Storage.
      *  Grants: none needed.
      */
     setLocalStorageValue: function(name, value) {
@@ -253,7 +275,8 @@ var GMC = GMC || {
     /*
      *  GMC.setSessionStorageValue(name, value)
      *
-     *  Similar to setLocalStorageValue(), but setSessionStorageValue() only stores for the current session.
+     *  Similar to setLocalStorageValue(), but setSessionStorageValue() only stores for the current
+     *  session.
      *  Grants: none needed.
      */
     setSessionStorageValue: function(name, value) {
@@ -309,7 +332,8 @@ var GMC = GMC || {
     /*
      *  GMC.log(message)
      *
-     *  Write a log-line to console. Uses GM_log if supported, otherwise directly via window.console.log().
+     *  Writes a log-line to the console. It will use GM_log if supported, otherwise it will do it
+     *  via window.console.log().
      *  Grants:
      *  GM_log
      */
@@ -338,7 +362,7 @@ var GMC = GMC || {
      *
      *  Adds style in a an element in html header.
      *  Grants:
-     *  GM_addStyle (Optional. Will be used when available, but this method should normally also work without)
+     *  GM_addStyle (Optional. Will be used when available, but this method should normally work fine without)
      */
     addStyle: function(style) {
         if (typeof GM_addStyle === 'function') {
@@ -352,15 +376,15 @@ var GMC = GMC || {
             head.appendChild(styleElem);
             return styleElem;
         }
-        alert('Error: Unable to add style element in head.');
+        alert('GMC Error: Unable to add style element in head.');
     },
 
 
     /*
      *  GMC.openInTab(url)
      *
-     *  Opens url in a new tab (or window). If GM_openInTab ain't supported window.open is used instead.
-     *  In most browsers/configurations this will open as a tab anyway (but no guarantee).
+     *  Opens url in a new tab (or window). If GM_openInTab ain't supported window.open is used
+     *  instead. In most browsers/configurations this will open as a tab anyway (but no guarantee).
      *  Grants:
      *  GM_openInTab
      */
@@ -391,7 +415,7 @@ var GMC = GMC || {
         if (GMC.info && typeof GMC.info.script === 'object') {
             return 'gmc' + GMC.getScriptNamespace().replace(/[^\w]+/g,'x') + GMC.getScriptName().replace(/[^\w]+/g,'x');
         } else {
-            alert('Error: Script Namespace or Name not found.');
+            alert('GMC Error: Script Namespace or Name not found.');
         }
     },
     contextMenuSupported: function() { // Argh, it's a bit ugly, not 100% accurate (and maybe unnecessary), but...
