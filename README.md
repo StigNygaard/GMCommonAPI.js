@@ -29,7 +29,9 @@ Currently implemented methods and properties in GMCommonAPI.js are:
 
 - GMC.info
 - GMC.registerMenuCommand(caption, commandFunc, accessKey)  **- This creates a page _context menu_ in GM4/Firefox**
+- GMC.registerMenuCommand(caption, commandFunc, options)  **- This creates a page _context menu_ in GM4/Firefox**
 - GMC.getResourceURL(resourceName)
+- GMC.getResourceUrl(resourceName)
 - GMC.setValue(name, value)  **- See compatibility comment in source code!**
 - GMC.getValue(name, defvalue)
 - GMC.deleteValue(name)

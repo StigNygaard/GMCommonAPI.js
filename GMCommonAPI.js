@@ -13,7 +13,7 @@ var GMC = GMC || {
 
     // CHANGELOG - The most important updates/versions:
     changelog : [
-        {version: '2017.11.09', description: 'Misc. updates.'},
+        {version: '2017.11.11', description: 'Advanced options for menus (Via GMC.registerMenuCommand() using new options parameter).'},
         {version: '2017.10.29', description: 'Adding GMC.listValues(), GMC.listLocalStorageValues() and GMC.listSessionStorageValues().'},
         {version: '2017.10.28', description: '@grant not needed for use of GM.info/GM_info.'},
         {version: '2017.10.25', description: 'Initial release.'}
@@ -37,11 +37,10 @@ var GMC = GMC || {
      *  context menus, which are created by this method when supported (Currently only supported by
      *  Firefox). AccessKey is currently ignored for context menus.
      *  Instead of the accessKey string parameter, there's an option to pass an options object
-     *  adding multiple configuration options for fine-tuning context menus.
-     *  (TODO: Document (and test) the options parameter for context-menus)
+     *  adding multiple configuration options for fine-tuning menus.
      *  Grants:
      *  GM_registerMenuCommand
-     *  GM.registerMenuCommand (Optional for possible future support. Currently not available in any userscript manager)
+     *  GM.registerMenuCommand (Optional for possible future support. Currently not available with any userscript manager)
      */
     registerMenuCommand: function(caption, commandFunc, options) {
         if (typeof options === 'string') {
@@ -49,32 +48,39 @@ var GMC = GMC || {
         } else if (typeof options === 'undefined') {
             options = {};
         }
-        if (typeof GM_registerMenuCommand === 'function') {
-            // Supported by most userscript extensions, but NOT in Greasemonkey 4 WebExtension
-            GM_registerMenuCommand(caption, commandFunc, options.accessKey);
-        } else if (GM && typeof GM.registerMenuCommand === 'function') {
-            // Will probably NOT be implemented in the upcoming Greasemonkey 4 WebExtension, but if?...
-            GM.registerMenuCommand(caption, commandFunc, options.accessKey);
+        if (!options.disabled) {
+            let prefix = '';
+            if (options.type === 'radio') {
+                prefix = options.checked ? '\u26AB ' : '\u26AA '; // ⚫/⚪
+            } else if (options.type === 'checkbox') {
+                prefix = options.checked ? '\u25FC ' : '\u25FB '; // ◼/◻
+            }
+            if (typeof GM_registerMenuCommand === 'function') {
+                // Supported by most userscript managers, but NOT with Greasemonkey 4 WebExtension
+                GM_registerMenuCommand(prefix + caption, commandFunc, options.accessKey);
+            } else if (GM && typeof GM.registerMenuCommand === 'function') {
+                // NOT implemented in Greasemonkey 4 WebExtension, but if later?...
+                GM.registerMenuCommand(prefix + caption, commandFunc, options.accessKey);
+            }
         }
-        if (GMC.contextMenuSupported()) {
+        // HTML5 context menu:
+        if (GMC.contextMenuSupported()) { // Currently only supported in Firefox...
             if (!document.body) {
                 alert('GMC Error: Body for context menu not found.');
                 return;
             }
-            // Setup HTML5 contextmenu on page - Currently only supported in Firefox...
             let topMenu = null;
             if (document.body.getAttribute('contextmenu')) {
-                // If existing context menu on body, don't replace but use it...
+                // If existing context menu on body, don't replace but use/extend it...
                 topMenu = document.querySelector('menu#'+document.body.getAttribute('contextmenu'));
             }
             if (!topMenu) {
-                // if not already exist, create the "top menu container"
+                // if not already defined, create the "top menu container"
                 topMenu = document.createElement("menu");
                 topMenu.setAttribute('type', 'context');
                 topMenu.setAttribute('id', 'gm-registered-menu');
                 document.body.appendChild(topMenu);
                 document.body.setAttribute('contextmenu', topMenu.getAttribute('id'));
-
             }
             // Create menu item
             let menuItem = document.createElement("menuitem");
@@ -84,17 +90,16 @@ var GMC = GMC || {
             if (options.name) menuItem.setAttribute('name', options.name);
             if (options.checked) menuItem.setAttribute('checked', 'checked');
             if (options.disabled) menuItem.setAttribute('disabled', 'disabled');
-            if (options.icon) menuItem.setAttribute('icon', options.icon);
+            if (options.icon) menuItem.setAttribute('icon', options.icon); // does icon work on radio/checkbox or only command?
             // Append menuitem
             if (options.topLevel) {
                 topMenu.appendChild(menuItem)
             } else { // script menu
-                let scriptMenu = document.querySelector('menu#menu'+GMC.getScriptIdentifier());
+                let scriptMenu = topMenu.querySelector('menu[label="'+GMC.getScriptName()+'"]');
                 if (!scriptMenu) {
-                    // if not already exist, create a "sub-menu" for current userscript
+                    // if not already defined, create a "sub-menu" for current userscript
                     scriptMenu = document.createElement("menu");
                     scriptMenu.setAttribute('label', GMC.getScriptName());
-                    scriptMenu.setAttribute('id', 'menu' + GMC.getScriptIdentifier());
                     // icon = icon32??? NO, icon not working for menu elements :-(
                     topMenu.appendChild(scriptMenu);
                 }
@@ -114,7 +119,7 @@ var GMC = GMC || {
      *  Grants:
      *  GM_getResourceURL
      */
-    getResourceURL: function(resourceName) {
+    getResourceUrl: function(resourceName) {
         if (typeof GM_getResourceURL === 'function') {
             return GM_getResourceURL(resourceName);
         } else if (GMC.info) {
@@ -133,8 +138,8 @@ var GMC = GMC || {
             alert('GMC Error: Cannot lookup resourceURL (Missing @grant for GM_getResourceURL?)');
         }
     },
-    getResourceUrl: function(resourceName) {
-        return GMC.getResourceURL(resourceName);
+    getResourceURL: function(resourceName) {
+        return GMC.getResourceUrl(resourceName);
     },
 
 
@@ -396,7 +401,12 @@ var GMC = GMC || {
     },
 
 
-
+    /*
+     *  GMC.getScriptName()
+     *
+     *  Simply returns script name as defined in meta data. If no name was defined, returns "Userscript".
+     *  Grants: none needed.
+     */
     getScriptName: function() {
         if (typeof GMC.info.script.name === 'string' && GMC.info.script.name.trim().length > 0) {
             return GMC.info.script.name.trim();
@@ -404,6 +414,14 @@ var GMC = GMC || {
             return 'Userscript';
         }
     },
+
+
+    /*
+     *  GMC.getScriptNamespace()
+     *
+     *  Simply returns the script's namespace as defined in meta data.
+     *  Grants: none needed.
+     */
     getScriptNamespace: function() {
         if (typeof GMC.info.script.namespace === 'string') {
             return GMC.info.script.namespace.trim();
@@ -411,16 +429,19 @@ var GMC = GMC || {
             return '';
         }
     },
-    getScriptIdentifier: function() { // A "safe" identifier without any special characters
+
+
+    // Internal stuff:
+    contextMenuSupported: function() { // Argh, it's a bit ugly, not 100% accurate (and probably not really necessary), but...
+        let oMenu = document.createElement("menu");
+        return (oMenu.type !== "undefined"); // type="list|context|toolbar" if supported ?
+    },
+    getScriptIdentifier: function() { // A "safe" identifier without any special characters (but doesn't work well for non-latin :-/ )
         if (GMC.info && typeof GMC.info.script === 'object') {
             return 'gmc' + GMC.getScriptNamespace().replace(/[^\w]+/g,'x') + GMC.getScriptName().replace(/[^\w]+/g,'x');
         } else {
             alert('GMC Error: Script Namespace or Name not found.');
         }
-    },
-    contextMenuSupported: function() { // Argh, it's a bit ugly, not 100% accurate (and maybe unnecessary), but...
-        let oMenu = document.createElement("menu");
-        return (oMenu.type !== "undefined"); // type="list|context|toolbar" if supported ?
     },
 
 };
