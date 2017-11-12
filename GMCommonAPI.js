@@ -38,7 +38,10 @@ var GMC = GMC || {
      *  Firefox). AccessKey is currently ignored for context menus.
      *  Instead of the accessKey string parameter, there's an option to pass an options object
      *  adding multiple configuration options for fine-tuning menus. Example:
-     *  GMC.registerMenuCommand('Hide the top', toggleTop , {accessKey: 'T', type: 'checkbox', checked: topIsHidden()});
+     *    GMC.registerMenuCommand( 'Hide the top', toggleTop , {accessKey: 'T', type: 'checkbox', checked: isHiddenTop()} );
+     *  Currently supported properties in the options object are:
+     *    accessKey, topLevel, id, name, type, checked, disabled & icon.
+     *  Todo: Document the properties in the options object.
      *
      *  Grants:
      *  GM_registerMenuCommand
@@ -66,50 +69,48 @@ var GMC = GMC || {
                 GM.registerMenuCommand(prefix + caption, commandFunc, options['accessKey']);
             }
         }
-        // HTML5 context menu:
-        if (GMC.contextMenuSupported()) { // Currently only supported in Firefox...
-            if (!document.body) {
-                alert('GMC Error: Body for context menu not found.');
-                return;
-            }
-            let topMenu = null;
-            if (document.body.getAttribute('contextmenu')) {
-                // If existing context menu on body, don't replace but use/extend it...
-                topMenu = document.querySelector('menu#'+document.body.getAttribute('contextmenu'));
-            }
-            if (!topMenu) {
-                // if not already defined, create the "top menu container"
-                topMenu = document.createElement('menu');
-                topMenu.setAttribute('type', 'context');
-                topMenu.setAttribute('id', 'gm-registered-menu');
-                document.body.appendChild(topMenu);
-                document.body.setAttribute('contextmenu', topMenu.getAttribute('id'));
-            }
-            // Create menu item
-            let menuItem = document.createElement('menuitem');
-            menuItem.setAttribute('type', options['type'] ? options['type'] : 'command'); // command, checkbox or radio
-            menuItem.setAttribute('label', caption);
-            if (options['id']) menuItem.setAttribute('id', options['id']);
-            if (options['name']) menuItem.setAttribute('name', options['name']);
-            if (options['checked']) menuItem.setAttribute('checked', 'checked');
-            if (options['disabled']) menuItem.setAttribute('disabled', 'disabled');
-            if (options['icon']) menuItem.setAttribute('icon', options['icon']); // does icon work on radio/checkbox or only command?
-            // Append menuitem
-            if (options['topLevel']) {
-                topMenu.appendChild(menuItem)
-            } else { // script menu
-                let scriptMenu = topMenu.querySelector('menu[label="'+GMC.getScriptName()+'"]');
-                if (!scriptMenu) {
-                    // if not already defined, create a "sub-menu" for current userscript
-                    scriptMenu = document.createElement('menu');
-                    scriptMenu.setAttribute('label', GMC.getScriptName());
-                    // icon = icon32??? NO, icon not working for menu elements :-(
-                    topMenu.appendChild(scriptMenu);
-                }
-                scriptMenu.appendChild(menuItem);
-            }
-            menuItem.addEventListener('click', commandFunc, false);
+        // HTML5 context menu (currently only supported by the Firefox family):
+        if (!document.body) {
+            alert('GMC Error: Body for context menu not found.');
+            return;
         }
+        let topMenu = null;
+        if (document.body.getAttribute('contextmenu')) {
+            // If existing context menu on body, don't replace but use/extend it...
+            topMenu = document.querySelector('menu#'+document.body.getAttribute('contextmenu'));
+        }
+        if (!topMenu) {
+            // if not already defined, create the "top menu container"
+            topMenu = document.createElement('menu');
+            topMenu.setAttribute('type', 'context');
+            topMenu.setAttribute('id', 'gm-registered-menu');
+            document.body.appendChild(topMenu);
+            document.body.setAttribute('contextmenu', topMenu.getAttribute('id'));
+        }
+        // Create menu item
+        let menuItem = document.createElement('menuitem');
+        menuItem.setAttribute('type', options['type'] ? options['type'] : 'command'); // command, checkbox or radio
+        menuItem.setAttribute('label', caption);
+        if (options['id']) menuItem.setAttribute('id', options['id']);
+        if (options['name']) menuItem.setAttribute('name', options['name']);
+        if (options['checked']) menuItem.setAttribute('checked', 'checked');
+        if (options['disabled']) menuItem.setAttribute('disabled', 'disabled');
+        if (options['icon']) menuItem.setAttribute('icon', options['icon']); // does icon work on radio/checkbox or only command?
+        // Append menuitem
+        if (options['topLevel']) {
+            topMenu.appendChild(menuItem)
+        } else { // script menu
+            let scriptMenu = topMenu.querySelector('menu[label="'+GMC.getScriptName()+'"]');
+            if (!scriptMenu) {
+                // if not already defined, create a "sub-menu" for current userscript
+                scriptMenu = document.createElement('menu');
+                scriptMenu.setAttribute('label', GMC.getScriptName());
+                // icon = icon32??? NO, icon not working for menu elements :-(
+                topMenu.appendChild(scriptMenu);
+            }
+            scriptMenu.appendChild(menuItem);
+        }
+        menuItem.addEventListener('click', commandFunc, false);
     },
 
 
@@ -435,7 +436,7 @@ var GMC = GMC || {
 
 
     // Internal stuff:
-    contextMenuSupported: function() { // Argh, it's a bit ugly, not 100% accurate (and probably not really necessary), but...
+    contextMenuSupported: function() { // Argh, it's a bit ugly, not 100% accurate (and probably not really necessary)
         let oMenu = document.createElement('menu');
         return (oMenu.type !== 'undefined'); // type="list|context|toolbar" if supported ?
     },
@@ -446,5 +447,12 @@ var GMC = GMC || {
             alert('GMC Error: Script Namespace or Name not found.');
         }
     },
+    inspect: function(obj) { // for some debugging
+        var output='';
+        for (var property in obj) {
+            output+=property+': ' + typeof obj[property] + ((typeof obj[property] === 'string' || typeof obj[property] === 'boolean' || typeof obj[property] === 'number') ? ' = ' + obj[property] : '') + '\n';
+        }
+        alert(output);
+    }
 
 };
