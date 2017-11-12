@@ -35,7 +35,7 @@ var GMC = GMC || {
      *
      *  Currently the GM4 API is missing GM.registerMenuCommand, but luckily Firefox supports HTML5
      *  context menus, which are created by this method when supported (Currently only supported by
-     *  Firefox). AccessKey is currently ignored for context menus.
+     *  the Firefox family). AccessKey is currently ignored for context menus.
      *  Instead of the accessKey string parameter, there's an option to pass an options object
      *  adding multiple configuration options for fine-tuning menus. Example:
      *    GMC.registerMenuCommand( 'Hide the top', toggleTop , {accessKey: 'T', type: 'checkbox', checked: isHiddenTop()} );
@@ -105,7 +105,7 @@ var GMC = GMC || {
                 // if not already defined, create a "sub-menu" for current userscript
                 scriptMenu = document.createElement('menu');
                 scriptMenu.setAttribute('label', GMC.getScriptName());
-                // icon = icon32??? NO, icon not working for menu elements :-(
+                // icon = @icon from metadata??? NO, icon not working for menu elements :-(
                 topMenu.appendChild(scriptMenu);
             }
             scriptMenu.appendChild(menuItem);
@@ -435,7 +435,13 @@ var GMC = GMC || {
     },
 
 
-    // Internal stuff:
+    // Internal, temporary and experimental stuff:
+    isGreasemonkey4up: function() {
+        if (typeof GMC.info.scriptHandler === 'string' && typeof GMC.info.version === 'string') {
+            return GMC.info.scriptHandler === 'Greasemonkey' && parseInt(GMC.info.version,10)>=4;
+        }
+        return false;
+    },
     contextMenuSupported: function() { // Argh, it's a bit ugly, not 100% accurate (and probably not really necessary)
         let oMenu = document.createElement('menu');
         return (oMenu.type !== 'undefined'); // type="list|context|toolbar" if supported ?
@@ -448,8 +454,8 @@ var GMC = GMC || {
         }
     },
     inspect: function(obj) { // for some debugging
-        var output='';
-        for (var property in obj) {
+        let output='';
+        for (let property in obj) {
             output+=property+': ' + typeof obj[property] + ((typeof obj[property] === 'string' || typeof obj[property] === 'boolean' || typeof obj[property] === 'number') ? ' = ' + obj[property] : '') + '\n';
         }
         alert(output);
