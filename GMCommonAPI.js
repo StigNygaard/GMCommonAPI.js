@@ -53,7 +53,7 @@ var GMC = GMC || {
             if (options.type === 'radio') {
                 prefix = options.checked ? '\u26AB ' : '\u26AA '; // ⚫/⚪
             } else if (options.type === 'checkbox') {
-                prefix = options.checked ? '\u25FC ' : '\u25FB '; // ◼/◻
+                prefix = options.checked ? '\u2B1B ' : '\u2B1C '; // ⬛/⬜
             }
             if (typeof GM_registerMenuCommand === 'function') {
                 // Supported by most userscript managers, but NOT with Greasemonkey 4 WebExtension
