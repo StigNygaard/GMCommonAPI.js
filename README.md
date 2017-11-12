@@ -2,11 +2,9 @@
 
 GM Common API (GMC) is a library designed for _easily adding **Greasemonkey 4** compatibility_ to existing userscripts.
 
-GMC provides a common subset of the functionality offered by the new "asynchronous API" in Greasemonkey 4 (GM.\*) and the classic "synchronous API" from other userscript managers (GM_\*). All offered in a single "classic" _synchronous API_ (GMC.\*).
-
 With the [introduction of the Greasemonkey 4 WebExtension](http://www.greasespot.net/2017/09/greasemonkey-4-announcement.html), the classic GM_\* "synchronous" API is replaced with a new GM.\* "asynchronous API". The _features_ of the new API in Greasemonkey 4 (GM4) are very similar to the classic API, but all the functions are _asynchronous_. This means you might need to (learn asynchronous programming and) do some refactoring of your existing userscripts to make use of the new API in GM4.
 
-**As an _alternative_ to refactoring your code, GMC offers a "synchronous subset" of the GM APIs** which works with scripts running in both the new GM4, the older versions of Greasemonkey, and in other userscript managers like Tampermonkey and Violentmonkey. Where APIs are supported in GMC, no refactoring of your script is needed; Simply add the needed \@require declaration (and eventually \@grant declarations) to your userscript, and replace the use of GM_\* methods with equivalent GMC.\* methods.
+**As an _alternative_ to refactoring your code, GMC offers a "synchronous subset" of the GM APIs** which works with scripts running in both the new GM4, the older versions of Greasemonkey, and in other userscript managers like Tampermonkey and Violentmonkey. Where APIs are supported in GMC, no refactoring of your script is needed; Simply add the needed \@require declaration (and eventually some \@grant declarations) to your userscript, and replace the use of GM_\* methods with equivalent GMC.\* methods.
 
 You can add GMC to your userscript by adding (some of the) following declarations to the Meta data block:
 
