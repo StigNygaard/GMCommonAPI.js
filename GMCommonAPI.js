@@ -37,30 +37,33 @@ var GMC = GMC || {
      *  context menus, which are created by this method when supported (Currently only supported by
      *  Firefox). AccessKey is currently ignored for context menus.
      *  Instead of the accessKey string parameter, there's an option to pass an options object
-     *  adding multiple configuration options for fine-tuning menus.
+     *  adding multiple configuration options for fine-tuning menus. Example:
+     *  GMC.registerMenuCommand('Hide the top', toggleTop , {accessKey: 'T', type: 'checkbox', checked: topIsHidden()});
+     *
      *  Grants:
      *  GM_registerMenuCommand
      *  GM.registerMenuCommand (Optional for possible future support. Currently not available with any userscript manager)
      */
     registerMenuCommand: function(caption, commandFunc, options) {
         if (typeof options === 'string') {
-            options = {accessKey: options};
+            options = {'accessKey': options};
         } else if (typeof options === 'undefined') {
             options = {};
         }
-        if (!options.disabled) {
+        // "Legacy" menu:
+        if (!options['disabled']) {
             let prefix = '';
-            if (options.type === 'radio') {
-                prefix = options.checked ? '\u26AB ' : '\u26AA '; // ⚫/⚪
-            } else if (options.type === 'checkbox') {
-                prefix = options.checked ? '\u2B1B ' : '\u2B1C '; // ⬛/⬜
+            if (options['type'] === 'radio') {
+                prefix = options['checked'] ? '\u26AB ' : '\u26AA '; // ⚫/⚪
+            } else if (options['type'] === 'checkbox') {
+                prefix = options['checked'] ? '\u2B1B ' : '\u2B1C '; // ⬛/⬜
             }
             if (typeof GM_registerMenuCommand === 'function') {
                 // Supported by most userscript managers, but NOT with Greasemonkey 4 WebExtension
-                GM_registerMenuCommand(prefix + caption, commandFunc, options.accessKey);
+                GM_registerMenuCommand(prefix + caption, commandFunc, options['accessKey']);
             } else if (GM && typeof GM.registerMenuCommand === 'function') {
-                // NOT implemented in Greasemonkey 4 WebExtension, but if later?...
-                GM.registerMenuCommand(prefix + caption, commandFunc, options.accessKey);
+                // NOT implemented in Greasemonkey 4.0 WebExtension, but if later?...
+                GM.registerMenuCommand(prefix + caption, commandFunc, options['accessKey']);
             }
         }
         // HTML5 context menu:
@@ -76,29 +79,29 @@ var GMC = GMC || {
             }
             if (!topMenu) {
                 // if not already defined, create the "top menu container"
-                topMenu = document.createElement("menu");
+                topMenu = document.createElement('menu');
                 topMenu.setAttribute('type', 'context');
                 topMenu.setAttribute('id', 'gm-registered-menu');
                 document.body.appendChild(topMenu);
                 document.body.setAttribute('contextmenu', topMenu.getAttribute('id'));
             }
             // Create menu item
-            let menuItem = document.createElement("menuitem");
-            menuItem.setAttribute('type', options.type ? options.type : 'command'); // command, checkbox or radio
+            let menuItem = document.createElement('menuitem');
+            menuItem.setAttribute('type', options['type'] ? options['type'] : 'command'); // command, checkbox or radio
             menuItem.setAttribute('label', caption);
-            if (options.id) menuItem.setAttribute('id', options.id);
-            if (options.name) menuItem.setAttribute('name', options.name);
-            if (options.checked) menuItem.setAttribute('checked', 'checked');
-            if (options.disabled) menuItem.setAttribute('disabled', 'disabled');
-            if (options.icon) menuItem.setAttribute('icon', options.icon); // does icon work on radio/checkbox or only command?
+            if (options['id']) menuItem.setAttribute('id', options['id']);
+            if (options['name']) menuItem.setAttribute('name', options['name']);
+            if (options['checked']) menuItem.setAttribute('checked', 'checked');
+            if (options['disabled']) menuItem.setAttribute('disabled', 'disabled');
+            if (options['icon']) menuItem.setAttribute('icon', options['icon']); // does icon work on radio/checkbox or only command?
             // Append menuitem
-            if (options.topLevel) {
+            if (options['topLevel']) {
                 topMenu.appendChild(menuItem)
             } else { // script menu
                 let scriptMenu = topMenu.querySelector('menu[label="'+GMC.getScriptName()+'"]');
                 if (!scriptMenu) {
                     // if not already defined, create a "sub-menu" for current userscript
-                    scriptMenu = document.createElement("menu");
+                    scriptMenu = document.createElement('menu');
                     scriptMenu.setAttribute('label', GMC.getScriptName());
                     // icon = icon32??? NO, icon not working for menu elements :-(
                     topMenu.appendChild(scriptMenu);
@@ -433,8 +436,8 @@ var GMC = GMC || {
 
     // Internal stuff:
     contextMenuSupported: function() { // Argh, it's a bit ugly, not 100% accurate (and probably not really necessary), but...
-        let oMenu = document.createElement("menu");
-        return (oMenu.type !== "undefined"); // type="list|context|toolbar" if supported ?
+        let oMenu = document.createElement('menu');
+        return (oMenu.type !== 'undefined'); // type="list|context|toolbar" if supported ?
     },
     getScriptIdentifier: function() { // A "safe" identifier without any special characters (but doesn't work well for non-latin :-/ )
         if (GMC.info && typeof GMC.info.script === 'object') {
