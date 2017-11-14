@@ -70,47 +70,49 @@ var GMC = GMC || {
             }
         }
         // HTML5 context menu (currently only supported by the Firefox family):
-        if (!document.body) {
-            alert('GMC Error: Body for context menu not found.');
-            return;
-        }
-        let topMenu = null;
-        if (document.body.getAttribute('contextmenu')) {
-            // If existing context menu on body, don't replace but use/extend it...
-            topMenu = document.querySelector('menu#'+document.body.getAttribute('contextmenu'));
-        }
-        if (!topMenu) {
-            // if not already defined, create the "top menu container"
-            topMenu = document.createElement('menu');
-            topMenu.setAttribute('type', 'context');
-            topMenu.setAttribute('id', 'gm-registered-menu');
-            document.body.appendChild(topMenu);
-            document.body.setAttribute('contextmenu', topMenu.getAttribute('id'));
-        }
-        // Create menu item
-        let menuItem = document.createElement('menuitem');
-        menuItem.setAttribute('type', options['type'] ? options['type'] : 'command'); // command, checkbox or radio
-        menuItem.setAttribute('label', caption);
-        if (options['id']) menuItem.setAttribute('id', options['id']);
-        if (options['name']) menuItem.setAttribute('name', options['name']);
-        if (options['checked']) menuItem.setAttribute('checked', 'checked');
-        if (options['disabled']) menuItem.setAttribute('disabled', 'disabled');
-        if (options['icon']) menuItem.setAttribute('icon', options['icon']); // does icon work on radio/checkbox or only command?
-        // Append menuitem
-        if (options['topLevel']) {
-            topMenu.appendChild(menuItem)
-        } else { // script menu
-            let scriptMenu = topMenu.querySelector('menu[label="'+GMC.getScriptName()+'"]');
-            if (!scriptMenu) {
-                // if not already defined, create a "sub-menu" for current userscript
-                scriptMenu = document.createElement('menu');
-                scriptMenu.setAttribute('label', GMC.getScriptName());
-                // icon = @icon from metadata??? NO, icon not working for menu elements :-(
-                topMenu.appendChild(scriptMenu);
+        if (GMC.contextMenuSupported()) {
+            if (!document.body) {
+                alert('GMC Error: Body element for context menu not found. If running userscript at "document-start" you might need to delay initialization of menus.');
+                return;
             }
-            scriptMenu.appendChild(menuItem);
+            let topMenu = null;
+            if (document.body.getAttribute('contextmenu')) {
+                // If existing context menu on body, don't replace but use/extend it...
+                topMenu = document.querySelector('menu#' + document.body.getAttribute('contextmenu'));
+            }
+            if (!topMenu) {
+                // if not already defined, create the "top menu container"
+                topMenu = document.createElement('menu');
+                topMenu.setAttribute('type', 'context');
+                topMenu.setAttribute('id', 'gm-registered-menu');
+                document.body.appendChild(topMenu);
+                document.body.setAttribute('contextmenu', topMenu.getAttribute('id'));
+            }
+            // Create menu item
+            let menuItem = document.createElement('menuitem');
+            menuItem.setAttribute('type', options['type'] ? options['type'] : 'command'); // command, checkbox or radio
+            menuItem.setAttribute('label', caption);
+            if (options['id']) menuItem.setAttribute('id', options['id']);
+            if (options['name']) menuItem.setAttribute('name', options['name']);
+            if (options['checked']) menuItem.setAttribute('checked', 'checked');
+            if (options['disabled']) menuItem.setAttribute('disabled', 'disabled');
+            if (options['icon']) menuItem.setAttribute('icon', options['icon']); // does icon work on radio/checkbox or only command?
+            // Append menuitem
+            if (options['topLevel']) {
+                topMenu.appendChild(menuItem)
+            } else { // script menu
+                let scriptMenu = topMenu.querySelector('menu[label="' + GMC.getScriptName() + '"]');
+                if (!scriptMenu) {
+                    // if not already defined, create a "sub-menu" for current userscript
+                    scriptMenu = document.createElement('menu');
+                    scriptMenu.setAttribute('label', GMC.getScriptName());
+                    // icon = @icon from metadata??? NO, icon not working for menu elements :-(
+                    topMenu.appendChild(scriptMenu);
+                }
+                scriptMenu.appendChild(menuItem);
+            }
+            menuItem.addEventListener('click', commandFunc, false);
         }
-        menuItem.addEventListener('click', commandFunc, false);
     },
 
 
@@ -385,7 +387,7 @@ var GMC = GMC || {
             head.appendChild(styleElem);
             return styleElem;
         }
-        alert('GMC Error: Unable to add style element in head.');
+        alert('GMC Error: Unable to add style element to head element. If running userscript at "document-start" you might need to delay initialization of styles.');
     },
 
 
@@ -455,10 +457,9 @@ var GMC = GMC || {
     },
     inspect: function(obj) { // for some debugging
         let output='';
-        for (let property in obj) {
-            output+=property+': ' + typeof obj[property] + ((typeof obj[property] === 'string' || typeof obj[property] === 'boolean' || typeof obj[property] === 'number') ? ' = ' + obj[property] : '') + '\n';
-        }
+        Object.keys(obj).forEach(function(key, idx) {
+            output+=key+': ' + typeof obj[key] + ((typeof obj[key] === 'string' || typeof obj[key] === 'boolean' || typeof obj[key] === 'number') ? ' = ' + obj[key] : '') + '\n';
+        });
         alert(output);
     }
-
 };
