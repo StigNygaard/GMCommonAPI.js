@@ -4,24 +4,7 @@ GM Common API (GMC) is a library designed for _easily adding **Greasemonkey 4** 
 
 With the [introduction of the Greasemonkey 4 WebExtension](http://www.greasespot.net/2017/09/greasemonkey-4-announcement.html), the classic GM_\* "synchronous" API is replaced with a new GM.\* "asynchronous API". The _features_ of the new API in Greasemonkey 4 (GM4) are very similar to the classic API, but all the functions are _asynchronous_. This means you might need to (learn asynchronous programming and) do some refactoring of your existing userscripts to make use of the new API in GM4.
 
-**As an _alternative_ to refactoring your code, GMC offers a "synchronous subset" of the GM APIs** which works with scripts running in both the new GM4, the older versions of Greasemonkey, and in other userscript managers like Tampermonkey and Violentmonkey. Where APIs are supported in GMC, no refactoring of your script is needed; Simply add the needed \@require declaration (and eventually some \@grant declarations) to your userscript, and replace the use of GM_\* methods with equivalent GMC.\* methods.
-
-You can add GMC to your userscript by adding (some of the) following declarations to the Meta data block:
-
-    // @grant   GM_registerMenuCommand
-    // @grant   GM_getResourceURL
-    // @grant   GM_setValue
-    // @grant   GM_getValue
-    // @grant   GM_deleteValue
-    // @grant   GM_listValues
-    // @grant   GM_log
-    // @grant   GM.setClipboard
-    // @grant   GM_setClipboard
-    // @grant   GM_addStyle
-    // @grant   GM_openInTab
-    // @require https://github.com/StigNygaard/GMCommonAPI.js/raw/master/GMCommonAPI.js
-
-Depending on which features you need to use, not all grants are required. Currently you need to check [comments in the sourcecode](https://raw.githubusercontent.com/StigNygaard/GMCommonAPI.js/master/GMCommonAPI.js) to find the needed \@grant declarations for each method (**todo:** Document it in this README).
+**As an _alternative_ to refactoring your code, GMC offers a "synchronous subset" of the features found in the GM APIs** which works with scripts running in both the new GM4, the older versions of Greasemonkey, and in other userscript managers like Tampermonkey and Violentmonkey. Where APIs are supported in GMC, no refactoring of your script is needed; Simply add the needed \@require declaration (and eventually some \@grant declarations) to your userscript, and replace the use of GM_\* methods with equivalent GMC.\* methods.
 
 Currently implemented methods and properties in GMCommonAPI.js are:
 
@@ -46,6 +29,23 @@ Currently implemented methods and properties in GMCommonAPI.js are:
 - GMC.setClipboard(text)
 - GMC.addStyle(style)
 - GMC.openInTab(url)
+
+You can add GMC to your userscript by adding (some of the) following declarations to the Meta data block:
+
+    // @grant   GM_registerMenuCommand
+    // @grant   GM_getResourceURL
+    // @grant   GM_setValue
+    // @grant   GM_getValue
+    // @grant   GM_deleteValue
+    // @grant   GM_listValues
+    // @grant   GM_log
+    // @grant   GM.setClipboard
+    // @grant   GM_setClipboard
+    // @grant   GM_addStyle
+    // @grant   GM_openInTab
+    // @require https://github.com/StigNygaard/GMCommonAPI.js/raw/master/GMCommonAPI.js
+
+Depending on which features you need to use, not all grants are required. Currently you need to check [comments in the sourcecode](https://raw.githubusercontent.com/StigNygaard/GMCommonAPI.js/master/GMCommonAPI.js) to find the needed \@grant declarations for each method (**todo:** Document it in this README).
 
 You can include GMCommonAPI.js here from GitHub, but you can also [find GM Common API on Greasy Fork](https://greasyfork.org/scripts/34527). To include latest version from Greasy Fork, use:
  
