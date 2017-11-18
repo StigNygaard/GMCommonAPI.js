@@ -13,6 +13,7 @@ var GMC = GMC || {
 
     // CHANGELOG - The most important updates/versions:
     changelog : [
+        {version: '2017.11.18', description: 'Adding GMC.xmlHttpRequest().'},
         {version: '2017.11.11', description: 'Advanced options for menus (Via GMC.registerMenuCommand() using new options parameter).'},
         {version: '2017.10.29', description: 'Adding GMC.listValues(), GMC.listLocalStorageValues() and GMC.listSessionStorageValues().'},
         {version: '2017.10.28', description: '@grant not needed for use of GM.info/GM_info.'},
