@@ -343,8 +343,8 @@ var GMC = GMC || {
     /*
      *  GMC.log(message)
      *
-     *  Writes a log-line to the console. It will use GM_log if supported, otherwise it will do it
-     *  via window.console.log().
+     *  Writes a log-line to the console. It will use GM_log if supported/granted, otherwise
+     *  it will do it using window.console.log().
      *  Grants:
      *  GM_log
      */
@@ -352,7 +352,11 @@ var GMC = GMC || {
         if(typeof GM_log === 'function') {
             GM_log(message);
         } else if (window.console) {
-            window.console.log(GMC.getScriptNamespace() + GMC.getScriptName() + ' : ' + message);
+            if (GMC.info) {
+                window.console.log(GMC.getScriptNamespace() + GMC.getScriptName() + ' : ' + message);
+            } else {
+                window.console.log('GMC logline : ' + message);
+            }
         }
     },
 
@@ -404,6 +408,38 @@ var GMC = GMC || {
             return GM_openInTab(url);
         }
         return window.open(url);
+    },
+
+
+    /*
+     *  GMC.xmlHttpRequest(details)
+     *  GMC.xmlhttpRequest(details)
+     *
+     *  Forwards to either GM_xmlhttpRequest or GM.xmlHttpRequest.
+     *  Notice that (currently?) GM.xmlHttpRequest() in Greasemonkey 4 does not return a function
+     *  to use for abortion. In this case GMC.xmlHttpRequest will return a function which just
+     *  writes a line to the console log.
+     *  When adding @grant declarations, make sure to take notice of the case differences between
+     *  the APIs. GMC supports both case-variants (GMC.xmlHttpRequest and GMC.xmlhttpRequest).
+     *  Also remember to add needed @connect declarations for Tampermonkey:
+     *  https://tampermonkey.net/documentation.php#_connect
+     *
+     *  Grants:
+     *  GM.xmlHttpRequest
+     *  GM_xmlhttpRequest
+     */
+    xmlHttpRequest: function(details) {
+        if (typeof GM_xmlhttpRequest === 'function') {
+            return GM_xmlhttpRequest(details);
+        } else if (typeof GM.xmlHttpRequest === 'function') {
+            let abort = GM.xmlHttpRequest(details);
+            if (typeof abort !== 'function') abort = function() {GMC.log('Sorry, xmlHttpRequest abort function does not work in current setup!');};
+            return abort;
+        }
+        alert('GMC Error: xmlHttpRequest not found! Missing or misspelled @grant declaration? (Be aware of case differences in the APIs!)');
+    },
+    xmlhttpRequest: function(details) {
+        return GMC.xmlHttpRequest(details);
     },
 
 

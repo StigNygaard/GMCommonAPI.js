@@ -13,6 +13,8 @@ Currently implemented methods and properties in GMCommonAPI.js are:
 - GMC.registerMenuCommand(caption, commandFunc, options)  **- This creates a page _context menu_ in GM4/Firefox**
 - GMC.getResourceURL(resourceName)
 - GMC.getResourceUrl(resourceName)
+- GMC.xmlHttpRequest(details)  **- See notice about returned abort function in source code!**
+- GMC.xmlhttpRequest(details)  **- See notice about returned abort function in source code!**
 - GMC.setValue(name, value)  **- See compatibility comment in source code!**
 - GMC.getValue(name, defvalue)
 - GMC.deleteValue(name)
@@ -34,6 +36,8 @@ You can add GMC to your userscript by adding (some of the) following declaration
 
     // @grant   GM_registerMenuCommand
     // @grant   GM_getResourceURL
+    // @grant   GM.xmlHttpRequest
+    // @grant   GM_xmlhttpRequest
     // @grant   GM_setValue
     // @grant   GM_getValue
     // @grant   GM_deleteValue
