@@ -13,8 +13,8 @@ Currently implemented methods and properties in GMCommonAPI.js are:
 - GMC.registerMenuCommand(caption, commandFunc, options)  **- This creates a page _context menu_ in GM4/Firefox**
 - GMC.getResourceURL(resourceName)
 - GMC.getResourceUrl(resourceName)
-- GMC.xmlHttpRequest(details)  **- See notice about returned abort function in source code!**
-- GMC.xmlhttpRequest(details)  **- See notice about returned abort function in source code!**
+- GMC.xmlHttpRequest(details)
+- GMC.xmlhttpRequest(details)
 - GMC.setValue(name, value)  **- See compatibility comment in source code!**
 - GMC.getValue(name, defvalue)
 - GMC.deleteValue(name)
@@ -57,7 +57,7 @@ You can include GMCommonAPI.js here from GitHub, but you can also [find GM Commo
 
 To freeze the version included from Greasy Fork, use the _version_ parameter [as found on Greasy Fork](https://greasyfork.org/scripts/34527). For example:
 
-    // @require https://greasyfork.org/scripts/34527/code/GMCommonAPI.js?version=230318
+    // @require https://greasyfork.org/scripts/34527/code/GMCommonAPI.js?version=231591
 
 You can also just copy the complete (or the needed parts of the) javascript code into your userscript if you prefer to do it so. I consider the code Public Domain. 
 
