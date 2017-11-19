@@ -417,9 +417,6 @@ var GMC = GMC || {
      *  GMC.xmlhttpRequest(details)
      *
      *  Forwards to either GM_xmlhttpRequest or GM.xmlHttpRequest.
-     *  Notice that (currently?) GM.xmlHttpRequest() in Greasemonkey 4 does not return a function
-     *  to use for abortion. In this case GMC.xmlHttpRequest will return a function which just
-     *  writes a line to the console log.
      *  When adding @grant declarations, make sure to take notice of the case differences between
      *  the APIs. GMC supports both case-variants (GMC.xmlHttpRequest and GMC.xmlhttpRequest).
      *  Also remember to add needed @connect declarations for Tampermonkey:
@@ -433,9 +430,7 @@ var GMC = GMC || {
         if (typeof GM_xmlhttpRequest === 'function') {
             return GM_xmlhttpRequest(details);
         } else if (typeof GM.xmlHttpRequest === 'function') {
-            let abort = GM.xmlHttpRequest(details);
-            if (typeof abort !== 'function') abort = function() {GMC.log('Sorry, xmlHttpRequest abort function does not work in current setup!');};
-            return abort;
+            return GM.xmlHttpRequest(details); // probably undefined return value!
         }
         alert('GMC Error: xmlHttpRequest not found! Missing or misspelled @grant declaration? (Be aware of case differences in the APIs!)');
     },
