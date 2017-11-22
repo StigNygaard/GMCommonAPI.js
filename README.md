@@ -32,6 +32,9 @@ Currently implemented methods and properties in GMCommonAPI.js are:
 - GMC.addStyle(style)
 - GMC.openInTab(url)
 
+![screenshots](https://greasyfork.org/system/screenshots/screenshots/000/009/048/original/albumlinkr201711-1460x720.png?1510598505)
+*With GMC, script-menus on Firefox is found via right-click context menu on pages where script is active. Example from [Stig's Last.fm Album Linkr](https://greasyfork.org/scripts/21153-stig-s-last-fm-album-linkr).*
+
 You can add GMC to your userscript by adding (some of the) following declarations to the Meta data block:
 
     // @grant   GM_registerMenuCommand
