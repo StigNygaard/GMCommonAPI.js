@@ -354,9 +354,9 @@ var GMC = GMC || {
             GM_log(message);
         } else if (window.console) {
             if (GMC.info) {
-                window.console.log(GMC.getScriptNamespace() + GMC.getScriptName() + ' : ' + message);
+                window.console.log(GMC.getScriptName() + ' : ' + message);
             } else {
-                window.console.log('GMC logline : ' + message);
+                window.console.log('GMC : ' + message);
             }
         }
     },
@@ -370,7 +370,7 @@ var GMC = GMC || {
      *  GM.setClipboard
      *  GM_setClipboard
      */
-    setClipboard: (typeof GM_setClipboard === 'function' ? GM_setClipboard : (typeof GM === 'object' && GM !== null && typeof GM.setClipboard === 'function' ? GM.setClipboard : null) ),
+    setClipboard: (typeof GM_setClipboard === 'function' ? GM_setClipboard : (GM && typeof GM.setClipboard === 'function' ? GM.setClipboard : null) ),
 
 
     /*
@@ -379,20 +379,24 @@ var GMC = GMC || {
      *  Adds style in a an element in html header.
      *  Grants:
      *  GM_addStyle (Optional. Will be used when available, but this method should normally work fine without)
+     *  GM.addStyle (Optional for possible future support. Currently not available with any userscript manager)
      */
     addStyle: function(style) {
         if (typeof GM_addStyle === 'function') {
             return GM_addStyle(style);
+        } else if (GM && typeof GM.addStyle === 'function') {
+            return GM.addStyle(style); // For possible future support. Will Probably return undefined.
+        } else {
+            let head = document.getElementsByTagName('head')[0];
+            if (head) {
+                let styleElem = document.createElement('style');
+                styleElem.setAttribute('type', 'text/css');
+                styleElem.textContent = style;
+                head.appendChild(styleElem);
+                return styleElem;
+            }
+            alert('GMC Error: Unable to add style element to head element. If running userscript at "document-start" you might need to delay initialization of styles.');
         }
-        let head = document.getElementsByTagName('head')[0];
-        if (head) {
-            let styleElem = document.createElement('style');
-            styleElem.setAttribute('type', 'text/css');
-            styleElem.textContent = style;
-            head.appendChild(styleElem);
-            return styleElem;
-        }
-        alert('GMC Error: Unable to add style element to head element. If running userscript at "document-start" you might need to delay initialization of styles.');
     },
 
 
@@ -429,7 +433,7 @@ var GMC = GMC || {
     xmlHttpRequest: function(details) {
         if (typeof GM_xmlhttpRequest === 'function') {
             return GM_xmlhttpRequest(details);
-        } else if (typeof GM.xmlHttpRequest === 'function') {
+        } else if (GM && typeof GM.xmlHttpRequest === 'function') {
             return GM.xmlHttpRequest(details); // probably undefined return value!
         }
         alert('GMC Error: xmlHttpRequest not found! Missing or misspelled @grant declaration? (Be aware of case differences in the APIs!)');
