@@ -32,8 +32,8 @@ Currently implemented methods and properties in GMCommonAPI.js are:
 - GMC.addStyle(style)
 - GMC.openInTab(url)
 
-![screenshots](https://greasyfork.org/system/screenshots/screenshots/000/009/048/original/albumlinkr201711-1460x720.png?1510598505)
-*With GMC, script-menus on Firefox is found via right-click context menu on pages where script is active. Example from [Stig's Last.fm Album Linkr](https://greasyfork.org/scripts/21153-stig-s-last-fm-album-linkr).*
+![screenshots](https://greasyfork.org/system/screenshots/screenshots/000/009/048/original/albumlinkr201711-1460x720.png)
+*With GMC, script-menus in Firefox is found via the right-click context menu on pages where userscript is active. Example from [Stig's Last.fm Album Linkr](https://greasyfork.org/scripts/21153-stig-s-last-fm-album-linkr).*
 
 You can add GMC to your userscript by adding (some of the) following declarations to the Meta data block:
 
@@ -60,8 +60,8 @@ You can include GMCommonAPI.js here from GitHub, but you can also [find GM Commo
 
 To freeze the version included from Greasy Fork, use the _version_ parameter [as found on Greasy Fork](https://greasyfork.org/scripts/34527). For example:
 
-    // @require https://greasyfork.org/scripts/34527/code/GMCommonAPI.js?version=231591
+    // @require https://greasyfork.org/scripts/34527/code/GMCommonAPI.js?version=232851
 
 You can also just copy the complete (or the needed parts of the) javascript code into your userscript if you prefer to do it so. I consider the code Public Domain. 
 
-Notice, if you are ready to use an asynchronous API in your userscript (including the refactoring probably needed), you can use a library wrapping the classic API into the new asynchronous API. This will give you a larger cross-compatible API than using GMC. Adapting your userscripts to use an asynchronous cross-compatible API like [gm4-polyfill.js](https://github.com/greasemonkey/gm4-polyfill) is the recommended way to go forward for _optimal_ performance and "API completeness". GMC might just be a bit easier and faster to use for some of us.
+Notice, if you are ready to use an asynchronous API in your userscript (including the refactoring probably needed), you can use a library to wrap the classic API into the new asynchronous API. This will potentially give you a larger cross-compatible API than using GMC. Adapting your userscripts to use an asynchronous cross-compatible API with something like [gm4-polyfill.js](https://github.com/greasemonkey/gm4-polyfill) is the recommended way to go forward for _optimal_ performance and "API completeness". GMC might just be a bit easier and faster to use for some of us - or can be used as a temporary quick-fix before implementing use of the new asynchronous API.   
