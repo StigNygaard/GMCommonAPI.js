@@ -9,16 +9,17 @@
  */
 
 
-var GMC = GMC || {
+var GMC = GMC || (function api() {
 
     // CHANGELOG - The most important updates/versions:
-    changelog : [
+    let changelog = [
+        {version: '2017.12.03', description: 'Some refactoring. Fix: getResourceUrl would only return one resource in GM4.'},
         {version: '2017.11.18', description: 'Adding GMC.xmlHttpRequest().'},
         {version: '2017.11.11', description: 'Advanced options for menus (Via GMC.registerMenuCommand() using new options parameter).'},
         {version: '2017.10.29', description: 'Adding GMC.listValues(), GMC.listLocalStorageValues() and GMC.listSessionStorageValues().'},
         {version: '2017.10.28', description: '@grant not needed for use of GM.info/GM_info.'},
         {version: '2017.10.25', description: 'Initial release.'}
-    ],
+    ];
 
 
     /*
@@ -27,7 +28,7 @@ var GMC = GMC || {
      *  Maps to GM_info or GM.info object.
      *  Grants: none needed.
      */
-    info: (GM_info ? GM_info : (GM && typeof GM.info === 'object' ? GM.info : null) ),
+    let info = (GM_info ? GM_info : (GM && typeof GM.info === 'object' ? GM.info : null) );
 
 
     /*
@@ -48,7 +49,7 @@ var GMC = GMC || {
      *  GM_registerMenuCommand
      *  GM.registerMenuCommand (Optional for possible future support. Currently not available with any userscript manager)
      */
-    registerMenuCommand: function(caption, commandFunc, options) {
+    function registerMenuCommand(caption, commandFunc, options) {
         if (typeof options === 'string') {
             options = {'accessKey': options};
         } else if (typeof options === 'undefined') {
@@ -71,7 +72,7 @@ var GMC = GMC || {
             }
         }
         // HTML5 context menu (currently only supported by the Firefox family):
-        if (GMC.contextMenuSupported()) {
+        if (contextMenuSupported()) {
             if (!document.body) {
                 alert('GMC Error: Body element for context menu not found. If running userscript at "document-start" you might need to delay initialization of menus.');
                 return;
@@ -102,11 +103,11 @@ var GMC = GMC || {
             if (options['topLevel']) {
                 topMenu.appendChild(menuItem)
             } else { // script menu
-                let scriptMenu = topMenu.querySelector('menu[label="' + GMC.getScriptName() + '"]');
+                let scriptMenu = topMenu.querySelector('menu[label="' + getScriptName() + '"]');
                 if (!scriptMenu) {
                     // if not already defined, create a "sub-menu" for current userscript
                     scriptMenu = document.createElement('menu');
-                    scriptMenu.setAttribute('label', GMC.getScriptName());
+                    scriptMenu.setAttribute('label', getScriptName());
                     // icon = @icon from metadata??? NO, icon not working for menu elements :-(
                     topMenu.appendChild(scriptMenu);
                 }
@@ -114,7 +115,7 @@ var GMC = GMC || {
             }
             menuItem.addEventListener('click', commandFunc, false);
         }
-    },
+    }
 
 
     /*
@@ -126,28 +127,26 @@ var GMC = GMC || {
      *  Grants:
      *  GM_getResourceURL
      */
-    getResourceUrl: function(resourceName) {
+    function getResourceUrl(resourceName) {
         if (typeof GM_getResourceURL === 'function') {
             return GM_getResourceURL(resourceName);
-        } else if (GMC.info) {
-            if (typeof GMC.info.script === 'object' && typeof GMC.info.script.resources === 'object' && typeof GMC.info.script.resources[resourceName] === 'object' && GMC.info.script.resources[resourceName].url) {
-                return GMC.info.script.resources[resourceName].url;
-            } else if (GMC.info.scriptMetaStr) {
+        } else if (info) {
+            if (typeof info.script === 'object' && typeof info.script.resources === 'object' && typeof info.script.resources[resourceName] === 'object' && info.script.resources[resourceName].url) {
+                return info.script.resources[resourceName].url;
+            } else if (info.scriptMetaStr) {
                 // Parse metadata block to find the original "remote url" instead:
-                let ptrn = new RegExp('^\\s*\\/\\/\\s*@resource\\s+([^\\s]+)\\s+([^\\s]+)\\s*$','im');
-                let a = GMC.info.scriptMetaStr.match(ptrn);
-                if (a) {
-                    return a[2];
+                let ptrn = new RegExp('^\\s*\\/\\/\\s*@resource\\s+([^\\s]+)\\s+([^\\s]+)\\s*$','igm');
+                let result;
+                while((result = ptrn.exec(info.scriptMetaStr)) !== null) {
+                    if (result[1] === resourceName) return result[2];
+                    // and do a GM4 "prefetch"?
                 }
             }
             alert('GMC Error: Cannot find url of resource=' + resourceName + ' in GMC.info object');
         } else {
             alert('GMC Error: Cannot lookup resourceURL (Missing @grant for GM_getResourceURL?)');
         }
-    },
-    getResourceURL: function(resourceName) {
-        return GMC.getResourceUrl(resourceName);
-    },
+    }
 
 
     /*
@@ -165,13 +164,13 @@ var GMC = GMC || {
      *  Grants:
      *  GM_setValue
      */
-    setValue: function(name, value) {
+    function setValue(name, value) {
         if (typeof GM_setValue === 'function') {
             GM_setValue(name, value);
         } else {
-            GMC.setLocalStorageValue(name, value);
+            setLocalStorageValue(name, value);
         }
-    },
+    }
 
 
     /*
@@ -182,13 +181,13 @@ var GMC = GMC || {
      *  Grants:
      *  GM_getValue
      */
-    getValue: function(name, defvalue) { // getLocalStorageValue: function(name, defvalue) {
+    function getValue(name, defvalue) { // getLocalStorageValue: function(name, defvalue) {
         if (typeof GM_getValue === 'function') {
             return GM_getValue(name, defvalue);
         } else {
-            return GMC.getLocalStorageValue(name, defvalue);
+            return getLocalStorageValue(name, defvalue);
         }
-    },
+    }
 
 
     /*
@@ -199,13 +198,13 @@ var GMC = GMC || {
      *  Grants:
      *  GM_deleteValue
      */
-    deleteValue: function(name) {
+    function deleteValue(name) {
         if (typeof GM_deleteValue === 'function') {
             GM_deleteValue(name);
         } else {
-            GMC.deleteLocalStorageValue(name);
+            deleteLocalStorageValue(name);
         }
-    },
+    }
 
 
     /*
@@ -216,13 +215,13 @@ var GMC = GMC || {
      *  Grants:
      *  GM_listValues
      */
-    listValues: function() {
+    function listValues() {
         if (typeof GM_listValues === 'function') {
             return GM_listValues();
         } else {
-            return GMC.listLocalStorageValues();
+            return listLocalStorageValues();
         }
-    },
+    }
 
 
     /*
@@ -234,9 +233,9 @@ var GMC = GMC || {
      *  to the name used in Web Storage.
      *  Grants: none needed.
      */
-    setLocalStorageValue: function(name, value) {
-        localStorage.setItem(GMC.getScriptIdentifier() + '_' + name, value);
-    },
+    function setLocalStorageValue(name, value) {
+        localStorage.setItem(getScriptIdentifier() + '_' + name, value);
+    }
 
 
     /*
@@ -245,13 +244,13 @@ var GMC = GMC || {
      *  Get a value that was stored using GMC.setLocalStorageValue().
      *  Grants: none needed.
      */
-    getLocalStorageValue: function(name, defvalue) {
-        if ((GMC.getScriptIdentifier()+'_'+name) in localStorage) {
-            return localStorage.getItem(GMC.getScriptIdentifier()+'_'+name);
+    function getLocalStorageValue(name, defvalue) {
+        if ((getScriptIdentifier()+'_'+name) in localStorage) {
+            return localStorage.getItem(getScriptIdentifier()+'_'+name);
         } else {
             return defvalue;
         }
-    },
+    }
 
 
     /*
@@ -260,9 +259,9 @@ var GMC = GMC || {
      *  Deletes a value that was stored using GMC.setLocalStorageValue().
      *  Grants: none needed.
      */
-    deleteLocalStorageValue: function(name) {
-        localStorage.removeItem(GMC.getScriptIdentifier() + '_' + name);
-    },
+    function deleteLocalStorageValue(name) {
+        localStorage.removeItem(getScriptIdentifier() + '_' + name);
+    }
 
 
     /*
@@ -271,17 +270,17 @@ var GMC = GMC || {
      *  Returns the values (key-names) stored using GMC.setLocalStorageValue().
      *  Grants: none needed.
      */
-    listLocalStorageValues: function() {
+    function listLocalStorageValues() {
         let values = [];
-        let prefix = GMC.getScriptIdentifier();
-        let prelen = GMC.getScriptIdentifier().length;
+        let prefix = getScriptIdentifier();
+        let prelen = getScriptIdentifier().length;
         for (let i = 0; i < localStorage.length; i++) {
             if (localStorage.key(i).substr(0, prelen) === prefix) {
                 values.push(localStorage.key(i).substr(prelen+1));
             }
         }
         return values;
-    },
+    }
 
 
     /*
@@ -291,9 +290,9 @@ var GMC = GMC || {
      *  session.
      *  Grants: none needed.
      */
-    setSessionStorageValue: function(name, value) {
-        sessionStorage.setItem(GMC.getScriptIdentifier() + '_' + name, value);
-    },
+    function setSessionStorageValue(name, value) {
+        sessionStorage.setItem(getScriptIdentifier() + '_' + name, value);
+    }
 
 
     /*
@@ -302,13 +301,13 @@ var GMC = GMC || {
      *  Get a value that was stored using GMC.setSessionStorageValue().
      *  Grants: none needed.
      */
-    getSessionStorageValue: function(name, defvalue) {
-        if ((GMC.getScriptIdentifier()+'_'+name) in localStorage) {
-            return sessionStorage.getItem(GMC.getScriptIdentifier()+'_'+name);
+    function getSessionStorageValue(name, defvalue) {
+        if ((getScriptIdentifier()+'_'+name) in localStorage) {
+            return sessionStorage.getItem(getScriptIdentifier()+'_'+name);
         } else {
             return defvalue;
         }
-    },
+    }
 
 
     /*
@@ -317,9 +316,9 @@ var GMC = GMC || {
      *  Deletes a value that was stored using GMC.setSessionStorageValue().
      *  Grants: none needed.
      */
-    deleteSessionStorageValue: function(name) {
-        sessionStorage.removeItem(GMC.getScriptIdentifier() + '_' + name);
-    },
+    function deleteSessionStorageValue(name) {
+        sessionStorage.removeItem(getScriptIdentifier() + '_' + name);
+    }
 
 
     /*
@@ -328,17 +327,17 @@ var GMC = GMC || {
      *  Returns the values (key-names) stored using GMC.setSessionStorageValue().
      *  Grants: none needed.
      */
-    listSessionStorageValues: function() {
+    function listSessionStorageValues() {
         let values = [];
-        let prefix = GMC.getScriptIdentifier();
-        let prelen = GMC.getScriptIdentifier().length;
+        let prefix = getScriptIdentifier();
+        let prelen = getScriptIdentifier().length;
         for (let i = 0; i < sessionStorage.length; i++) {
             if (sessionStorage.key(i).substr(0, prelen) === prefix) {
                 values.push(sessionStorage.key(i).substr(prelen+1));
             }
         }
         return values;
-    },
+    }
 
 
     /*
@@ -349,17 +348,17 @@ var GMC = GMC || {
      *  Grants:
      *  GM_log
      */
-    log: function(message) {
+    function log(message) {
         if(typeof GM_log === 'function') {
             GM_log(message);
         } else if (window.console) {
-            if (GMC.info) {
-                window.console.log(GMC.getScriptName() + ' : ' + message);
+            if (info) {
+                window.console.log(getScriptName() + ' : ' + message);
             } else {
                 window.console.log('GMC : ' + message);
             }
         }
-    },
+    }
 
 
     /*
@@ -370,7 +369,7 @@ var GMC = GMC || {
      *  GM.setClipboard
      *  GM_setClipboard
      */
-    setClipboard: (typeof GM_setClipboard === 'function' ? GM_setClipboard : (GM && typeof GM.setClipboard === 'function' ? GM.setClipboard : null) ),
+    let setClipboard = (typeof GM_setClipboard === 'function' ? GM_setClipboard : (GM && typeof GM.setClipboard === 'function' ? GM.setClipboard : null) );
 
 
     /*
@@ -381,7 +380,7 @@ var GMC = GMC || {
      *  GM_addStyle (Optional. Will be used when available, but this method should normally work fine without)
      *  GM.addStyle (Optional for possible future support. Currently not available with any userscript manager)
      */
-    addStyle: function(style) {
+    function addStyle(style) {
         if (typeof GM_addStyle === 'function') {
             return GM_addStyle(style);
         } else if (GM && typeof GM.addStyle === 'function') {
@@ -397,7 +396,7 @@ var GMC = GMC || {
             }
             alert('GMC Error: Unable to add style element to head element. If running userscript at "document-start" you might need to delay initialization of styles.');
         }
-    },
+    }
 
 
     /*
@@ -408,12 +407,12 @@ var GMC = GMC || {
      *  Grants:
      *  GM_openInTab
      */
-    openInTab: function(url) {
+    function openInTab(url) {
         if (typeof GM_openInTab === 'function') {
             return GM_openInTab(url);
         }
         return window.open(url);
-    },
+    }
 
 
     /*
@@ -430,17 +429,14 @@ var GMC = GMC || {
      *  GM.xmlHttpRequest
      *  GM_xmlhttpRequest
      */
-    xmlHttpRequest: function(details) {
+    function xmlHttpRequest(details) {
         if (typeof GM_xmlhttpRequest === 'function') {
             return GM_xmlhttpRequest(details);
         } else if (GM && typeof GM.xmlHttpRequest === 'function') {
             return GM.xmlHttpRequest(details); // probably undefined return value!
         }
         alert('GMC Error: xmlHttpRequest not found! Missing or misspelled @grant declaration? (Be aware of case differences in the APIs!)');
-    },
-    xmlhttpRequest: function(details) {
-        return GMC.xmlHttpRequest(details);
-    },
+    }
 
 
     /*
@@ -449,13 +445,13 @@ var GMC = GMC || {
      *  Simply returns script name as defined in meta data. If no name was defined, returns "Userscript".
      *  Grants: none needed.
      */
-    getScriptName: function() {
-        if (typeof GMC.info.script.name === 'string' && GMC.info.script.name.trim().length > 0) {
-            return GMC.info.script.name.trim();
+    function getScriptName() {
+        if (typeof info.script.name === 'string' && info.script.name.trim().length > 0) {
+            return info.script.name.trim();
         } else {
             return 'Userscript';
         }
-    },
+    }
 
 
     /*
@@ -464,38 +460,72 @@ var GMC = GMC || {
      *  Simply returns the script's namespace as defined in meta data.
      *  Grants: none needed.
      */
-    getScriptNamespace: function() {
-        if (typeof GMC.info.script.namespace === 'string') {
-            return GMC.info.script.namespace.trim();
+    function getScriptNamespace() {
+        if (typeof info.script.namespace === 'string') {
+            return info.script.namespace.trim();
         } else {
             return '';
         }
-    },
+    }
 
 
     // Internal, temporary and experimental stuff:
-    isGreasemonkey4up: function() {
-        if (typeof GMC.info.scriptHandler === 'string' && typeof GMC.info.version === 'string') {
-            return GMC.info.scriptHandler === 'Greasemonkey' && parseInt(GMC.info.version,10)>=4;
+    function isGreasemonkey4up() {
+        if (typeof info.scriptHandler === 'string' && typeof info.version === 'string') {
+            return info.scriptHandler === 'Greasemonkey' && parseInt(info.version,10)>=4;
         }
         return false;
-    },
-    contextMenuSupported: function() { // Argh, it's a bit ugly, not 100% accurate (and probably not really necessary)
+    }
+    function contextMenuSupported() { // Argh, it's a bit ugly, not 100% accurate (and probably not really necessary)
         let oMenu = document.createElement('menu');
         return (oMenu.type !== 'undefined'); // type="list|context|toolbar" if supported ?
-    },
-    getScriptIdentifier: function() { // A "safe" identifier without any special characters (but doesn't work well for non-latin :-/ )
-        if (GMC.info && typeof GMC.info.script === 'object') {
-            return 'gmc' + GMC.getScriptNamespace().replace(/[^\w]+/g,'x') + GMC.getScriptName().replace(/[^\w]+/g,'x');
+    }
+    function getScriptIdentifier() { // A "safe" identifier without any special characters (but doesn't work well for non-latin :-/ )
+        if (info && typeof info.script === 'object') {
+            return 'gmc' + getScriptNamespace().replace(/[^\w]+/g,'x') + getScriptName().replace(/[^\w]+/g,'x');
         } else {
             alert('GMC Error: Script Namespace or Name not found.');
         }
-    },
-    inspect: function(obj) { // for some debugging
+    }
+    function inspect(obj) { // for some debugging
         let output='';
         Object.keys(obj).forEach(function(key, idx) {
             output+=key+': ' + typeof obj[key] + ((typeof obj[key] === 'string' || typeof obj[key] === 'boolean' || typeof obj[key] === 'number') ? ' = ' + obj[key] : '') + '\n';
         });
         alert(output);
     }
-};
+
+
+    return {
+        info: info,
+        registerMenuCommand: registerMenuCommand,
+        getResourceUrl: getResourceUrl,
+        getResourceURL: getResourceUrl,
+        setValue: setValue,
+        getValue: getValue,
+        deleteValue: deleteValue,
+        listValues: listValues,
+        setLocalStorageValue: setLocalStorageValue,
+        getLocalStorageValue: getLocalStorageValue,
+        deleteLocalStorageValue: deleteLocalStorageValue,
+        listLocalStorageValues: listLocalStorageValues,
+        setSessionStorageValue: setSessionStorageValue,
+        getSessionStorageValue: getSessionStorageValue,
+        deleteSessionStorageValue: deleteSessionStorageValue,
+        listSessionStorageValues: listSessionStorageValues,
+        log: log,
+        setClipboard: setClipboard,
+        addStyle: addStyle,
+        openInTab: openInTab,
+        xmlHttpRequest: xmlHttpRequest,
+        xmlhttpRequest: xmlHttpRequest,
+        getScriptName: getScriptName,
+        getScriptNamespace: getScriptNamespace,
+
+        // Temporary and experimental stuff:
+        isGreasemonkey4up: isGreasemonkey4up,
+        contextMenuSupported: contextMenuSupported,
+        inspect: inspect
+    };
+
+})();
