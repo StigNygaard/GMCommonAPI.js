@@ -13,7 +13,8 @@ var GMC = GMC || (function api() {
 
     // CHANGELOG - The most important updates/versions:
     let changelog = [
-        {version: '2017.12.03', description: 'Some refactoring. Fix: getResourceUrl would only return one resource in GM4.'},
+        {version: '2017.12.06', description: 'Prefetch @resource objects in GM4+ for potential performance improvements (Requires @grant GM.getResourceUrl).'},
+        {version: '2017.12.03', description: 'Some refactoring. Fix: getResourceUrl would sometimes only return one resource in GM4.'},
         {version: '2017.11.18', description: 'Adding GMC.xmlHttpRequest().'},
         {version: '2017.11.11', description: 'Advanced options for menus (Via GMC.registerMenuCommand() using new options parameter).'},
         {version: '2017.10.29', description: 'Adding GMC.listValues(), GMC.listLocalStorageValues() and GMC.listSessionStorageValues().'},
@@ -126,6 +127,7 @@ var GMC = GMC || (function api() {
      *  the GMC.info object properties.
      *  Grants:
      *  GM_getResourceURL
+     *  GM.getResourceUrl (Optional, but add this for potential performance improvement in GM4+)
      */
     function getResourceUrl(resourceName) {
         if (typeof GM_getResourceURL === 'function') {
@@ -469,7 +471,9 @@ var GMC = GMC || (function api() {
     }
 
 
+
     // Internal, temporary and experimental stuff:
+
     function isGreasemonkey4up() {
         if (typeof info.scriptHandler === 'string' && typeof info.version === 'string') {
             return info.scriptHandler === 'Greasemonkey' && parseInt(info.version,10)>=4;
@@ -495,6 +499,20 @@ var GMC = GMC || (function api() {
         alert(output);
     }
 
+    if (GM && typeof GM.getResourceUrl === 'function' && typeof info === 'object' && typeof info.script === 'object' && typeof info.script.resources === 'object' ) {
+        // Prefetch @resource objects and update info.script.resources[resourcename].url with local address, using GM.getResourceUrl().
+        function prefetchResource(name) {
+            let obj = info.script.resources[name];
+            if (obj) {
+                GM.getResourceUrl(obj.name).then(function(url){obj.url = url},function(err){log('Error fetching resource '+obj.name+': '+err)}); // prefetch
+            } else {
+                log('Error, info.script.resources['+name+'] not found in resources object.');
+            }
+        }
+        Object.keys(info.script.resources).forEach(function(key, idx) {
+            prefetchResource(key);
+        });
+    }
 
     return {
         info: info,
