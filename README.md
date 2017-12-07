@@ -61,7 +61,7 @@ You can include GMCommonAPI.js here from GitHub, but you can also [find GM Commo
 
 To freeze the version included from Greasy Fork, use the _version_ parameter [as found on Greasy Fork](https://greasyfork.org/scripts/34527). For example:
 
-    // @require https://greasyfork.org/scripts/34527/code/GMCommonAPI.js?version=235354
+    // @require https://greasyfork.org/scripts/34527/code/GMCommonAPI.js?version=235553
 
 You can also just copy the complete (or the needed parts of the) javascript code into your userscript if you prefer to do it so. I consider the code Public Domain. 
 
