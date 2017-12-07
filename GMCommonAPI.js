@@ -13,6 +13,7 @@ var GMC = GMC || (function api() {
 
     // CHANGELOG - The most important updates/versions:
     let changelog = [
+        {version: '2017.12.07', description: 'Fixing an error seen in Chrome/Tampermonkey.'},
         {version: '2017.12.06', description: 'Prefetch @resource objects in GM4+ for potential performance improvements (Requires @grant GM.getResourceUrl).'},
         {version: '2017.12.03', description: 'Some refactoring. Fix: getResourceUrl would sometimes only return one resource in GM4.'},
         {version: '2017.11.18', description: 'Adding GMC.xmlHttpRequest().'},
@@ -29,7 +30,7 @@ var GMC = GMC || (function api() {
      *  Maps to GM_info or GM.info object.
      *  Grants: none needed.
      */
-    let info = (GM_info ? GM_info : (GM && typeof GM.info === 'object' ? GM.info : null) );
+    let info = (GM_info ? GM_info : (typeof GM === 'object' && GM !== null && typeof GM.info === 'object' ? GM.info : null) );
 
 
     /*
@@ -67,7 +68,7 @@ var GMC = GMC || (function api() {
             if (typeof GM_registerMenuCommand === 'function') {
                 // Supported by most userscript managers, but NOT with Greasemonkey 4 WebExtension
                 GM_registerMenuCommand(prefix + caption, commandFunc, options['accessKey']);
-            } else if (GM && typeof GM.registerMenuCommand === 'function') {
+            } else if (typeof GM === 'object' && GM !== null && typeof GM.registerMenuCommand === 'function') {
                 // NOT implemented in Greasemonkey 4.0 WebExtension, but if later?...
                 GM.registerMenuCommand(prefix + caption, commandFunc, options['accessKey']);
             }
@@ -102,7 +103,7 @@ var GMC = GMC || (function api() {
             if (options['icon']) menuItem.setAttribute('icon', options['icon']); // does icon work on radio/checkbox or only command?
             // Append menuitem
             if (options['topLevel']) {
-                topMenu.appendChild(menuItem)
+                topMenu.appendChild(menuItem);
             } else { // script menu
                 let scriptMenu = topMenu.querySelector('menu[label="' + getScriptName() + '"]');
                 if (!scriptMenu) {
@@ -371,7 +372,7 @@ var GMC = GMC || (function api() {
      *  GM.setClipboard
      *  GM_setClipboard
      */
-    let setClipboard = (typeof GM_setClipboard === 'function' ? GM_setClipboard : (GM && typeof GM.setClipboard === 'function' ? GM.setClipboard : null) );
+    let setClipboard = (typeof GM_setClipboard === 'function' ? GM_setClipboard : (typeof GM === 'object' && GM !== null && typeof GM.setClipboard === 'function' ? GM.setClipboard : null) );
 
 
     /*
@@ -385,7 +386,7 @@ var GMC = GMC || (function api() {
     function addStyle(style) {
         if (typeof GM_addStyle === 'function') {
             return GM_addStyle(style);
-        } else if (GM && typeof GM.addStyle === 'function') {
+        } else if (typeof GM === 'object' && GM !== null && typeof GM.addStyle === 'function') {
             return GM.addStyle(style); // For possible future support. Will Probably return undefined.
         } else {
             let head = document.getElementsByTagName('head')[0];
@@ -434,7 +435,7 @@ var GMC = GMC || (function api() {
     function xmlHttpRequest(details) {
         if (typeof GM_xmlhttpRequest === 'function') {
             return GM_xmlhttpRequest(details);
-        } else if (GM && typeof GM.xmlHttpRequest === 'function') {
+        } else if (typeof GM === 'object' && GM !== null && typeof GM.xmlHttpRequest === 'function') {
             return GM.xmlHttpRequest(details); // probably undefined return value!
         }
         alert('GMC Error: xmlHttpRequest not found! Missing or misspelled @grant declaration? (Be aware of case differences in the APIs!)');
@@ -499,16 +500,22 @@ var GMC = GMC || (function api() {
         alert(output);
     }
 
-    if (GM && typeof GM.getResourceUrl === 'function' && typeof info === 'object' && typeof info.script === 'object' && typeof info.script.resources === 'object' ) {
+    if (typeof GM === 'object' && GM !== null && typeof GM.getResourceUrl === 'function' && typeof info === 'object' && typeof info.script === 'object' && typeof info.script.resources === 'object' ) {
         // Prefetch @resource objects and update info.script.resources[resourcename].url with local address, using GM.getResourceUrl().
-        function prefetchResource(name) {
-            let obj = info.script.resources[name];
-            if (obj) {
-                GM.getResourceUrl(obj.name).then(function(url){obj.url = url},function(err){log('Error fetching resource '+obj.name+': '+err)}); // prefetch
-            } else {
-                log('Error, info.script.resources['+name+'] not found in resources object.');
+        prefetchResource = function(name) {
+            if (typeof info === 'object' && typeof info.script === 'object' && typeof info.script.resources === 'object') {
+                let obj = info.script.resources[name];
+                if (typeof GM === 'object' && GM !== null && typeof GM.getResourceUrl === 'function' && obj) {
+                    GM.getResourceUrl(obj.name).then(function (url) {
+                        obj.url = url;
+                    }, function (err) {
+                        log('Error fetching resource ' + obj.name + ': ' + err);
+                    });
+                } else {
+                    log('Error, info.script.resources[' + name + '] not found in resources object.');
+                }
             }
-        }
+        };
         Object.keys(info.script.resources).forEach(function(key, idx) {
             prefetchResource(key);
         });
