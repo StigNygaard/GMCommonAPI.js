@@ -13,6 +13,7 @@ var GMC = GMC || (function api() {
 
     // CHANGELOG - The most important updates/versions:
     let changelog = [
+        {version: '2017.12.16', description: 'GM4 actually supports GM.openInTab.'},
         {version: '2017.12.07', description: 'Fixing an error seen in Chrome/Tampermonkey.'},
         {version: '2017.12.06', description: 'Prefetch @resource objects in GM4+ for potential performance improvements (Requires @grant GM.getResourceUrl).'},
         {version: '2017.12.03', description: 'Some refactoring. Fix: getResourceUrl would sometimes only return one resource in GM4.'},
@@ -403,16 +404,18 @@ var GMC = GMC || (function api() {
 
 
     /*
-     *  GMC.openInTab(url)
+     *  GMC.openInTab(url, open_in_background)
      *
-     *  Opens url in a new tab (or window). If GM_openInTab ain't supported window.open is used
-     *  instead. In most browsers/configurations this will open as a tab anyway (but no guarantee).
+     *  Opens url in a new tab.
      *  Grants:
+     *  GM.openInTab
      *  GM_openInTab
      */
-    function openInTab(url) {
+    function openInTab(url, open_in_background) {
         if (typeof GM_openInTab === 'function') {
-            return GM_openInTab(url);
+            return GM_openInTab(url, open_in_background);
+        } else if (typeof GM === 'object' && GM !== null && typeof GM.openInTab === 'function') {
+            return GM.openInTab(url, open_in_background);
         }
         return window.open(url);
     }
