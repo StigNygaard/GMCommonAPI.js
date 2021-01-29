@@ -9,8 +9,8 @@ With the [introduction of the Greasemonkey 4 WebExtension](http://www.greasespot
 Currently implemented methods and properties in GMCommonAPI.js are:
 
 - GMC.info
-- GMC.registerMenuCommand(caption, commandFunc, accessKey)  **- This creates a page _context menu_ in GM4/Firefox**
-- GMC.registerMenuCommand(caption, commandFunc, options)  **- This creates a page _context menu_ in GM4/Firefox**
+- GMC.registerMenuCommand(caption, commandFunc, accessKey)
+- GMC.registerMenuCommand(caption, commandFunc, options)
 - GMC.getResourceURL(resourceName)
 - GMC.getResourceUrl(resourceName)
 - GMC.xmlHttpRequest(details)
@@ -32,9 +32,6 @@ Currently implemented methods and properties in GMCommonAPI.js are:
 - GMC.addStyle(style)
 - GMC.openInTab(url)
 
-![screenshots](https://greasyfork.org/system/screenshots/screenshots/000/009/048/original/albumlinkr201711-1460x720.png)
-*With GMC, script-menus in Firefox is found via the right-click context menu on pages where userscript is active. Example from [Stig's Last.fm Album Linkr](https://greasyfork.org/scripts/21153-stig-s-last-fm-album-linkr).*
-
 You can add GMC to your userscript by adding (some of the) following declarations to the Meta data block:
 
     // @grant   GM_registerMenuCommand
@@ -54,7 +51,7 @@ You can add GMC to your userscript by adding (some of the) following declaration
     // @grant   GM_openInTab
     // @require https://github.com/StigNygaard/GMCommonAPI.js/raw/master/GMCommonAPI.js
 
-Depending on which features you need to use, not all grants are required. Currently you need to check [comments in the sourcecode](https://raw.githubusercontent.com/StigNygaard/GMCommonAPI.js/master/GMCommonAPI.js) to find the needed \@grant declarations for each method (**todo:** Document it in this README).
+Depending on which features you need to use, not all grants are required. Currently you need to check [comments in the sourcecode](https://github.com/StigNygaard/GMCommonAPI.js/blob/master/GMCommonAPI.js) to find the needed \@grant declarations for each method (**todo:** Document it in this README).
 
 You can include GMCommonAPI.js here from GitHub, but you can also [find GM Common API on Greasy Fork](https://greasyfork.org/scripts/34527). To include latest version from Greasy Fork, use:
  
